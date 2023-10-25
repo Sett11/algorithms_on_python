@@ -1,11 +1,14 @@
-def primes(n):
-    if n<2:
-        return 0
-    a=[True]*(n+1)
-    a[0]=a[1]=False
-    for i in range(2,int(n**.5)+1):
-        for j in range(i*i,n,i):
-            a[j]=False
-    return [k for k in range(2,n) if a[k]]
+from random import shuffle
 
-print(primes(1000))
+def insert_sort(arr):
+    a=arr.copy()
+    shuffle(a)
+    for i in range(1,len(a)):
+        k=i
+        while k>0 and a[k-1]>a[k]:
+            a[k],a[k-1]=a[k-1],a[k]
+            k-=1
+    return a
+
+
+print(insert_sort(list(range(101))))
