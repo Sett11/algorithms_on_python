@@ -1,14 +1,11 @@
-def perm_str(a):
-    l=len(a)
-    if l==1:
-        return a
-    t=perm_str(a[1:])
-    p=a[0]
-    r=[]
-    for i in t:
-        for j in range(l):
-            q=i
-            r+=[q[0:j]+p+q[j:]]
-    return r
+def generate_permutations(n,m,p=None):
+    if not m:
+        print(p)
+        return
+    p=p or []
+    for i in range(n):
+        p.append(i)
+        generate_permutations(n,m-1,p)
+        p.pop()
 
-print(perm_str('ABXDEFG'))
+generate_permutations(2,4)
