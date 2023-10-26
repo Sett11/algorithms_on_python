@@ -1,16 +1,14 @@
-from random import shuffle,choice
-
-def hoar_sort(a):
-    if len(a)<2:
-        return a
-    t=choice(a)
-    l=[]
-    m=[]
+def perm(a):
+    l=len(a)
+    if l==1:
+        return [a]
+    t=perm(a[1:])
+    p=a[0]
     r=[]
-    [l.append(i) if i<t else r.append(i) if i>t else m.append(i) for i in a]
-    return hoar_sort(l)+m+hoar_sort(r)
+    for i in t:
+        for j in range(l):
+            q=i
+            r+=[q[0:j]+[p]+q[j:]]
+    return r
 
-
-arr=list(range(101))
-shuffle(arr)
-print(hoar_sort(arr))
+print(perm([1,2,3,4,5,6,7]))
