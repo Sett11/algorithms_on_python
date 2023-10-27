@@ -1,11 +1,5 @@
-def generate_permutations(n,m,p=None):
-    if not m:
-        print(p)
-        return
-    p=p or []
-    for i in range(n):
-        p.append(i)
-        generate_permutations(n,m-1,p)
-        p.pop()
+def prod(*a):
+    return {()} if not a else [tuple([i]+list(j)) for i in a[0] for j in prod(*a[1:])]
+    
 
-generate_permutations(2,4)
+print(prod({1},{2,3},{4,5,6},{7,8,9}))
