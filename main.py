@@ -1,26 +1,12 @@
-def left(a,n):
-    l=1
-    r=len(a)
-    while r-l>1:
-        m=(l+r)//2
-        if a[m]<n:
-            l=m
-        else:
-            r=m
-    return l+1
+def count_way(a):
+    m,n=len(a),len(a[0])
+    a[0]=[1]*n
+    for i in range(1,m):
+        a[i][0]=1
+    for i in range(1,m):
+        for j in range(1,n):
+            a[i][j]=a[i-1][j]+a[i][j-1]+a[i-1][j-1]
+    return a
 
-def right(a,n):
-    l=1
-    r=len(a)
-    while r-l>1:
-        m=(l+r)//2
-        if a[m]<=n:
-            l=m
-        else:
-            r=m
-    return r
 
-def binary_search(a,n):
-    return n in a[left(a,n):right(a,n)]
-
-print(binary_search([0, 1, 1, 2, 3, 3, 4, 4, 6, 59],3))
+print(count_way([[0 for i in range(7)] for j in range(7)]))
