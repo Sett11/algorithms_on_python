@@ -1,34 +1,28 @@
 """
->>> is_empty()
+>>> check_braces_sequence('[((()))]')
 True
->>> push(1)
->>> push(2)
->>> push(3)
->>> is_empty()
+>>> check_braces_sequence('[(((()))]')
 False
->>> pop()
-3
->>> pop()
-2
->>> pop()
-1
->>> is_empty()
+>>> check_braces_sequence('[(((())))]')
 True
 """
-_stack=[]
 
-def is_empty():
-    return not len(_stack)
+import A_stack
 
-def push(n):
-    _stack.append(n)
+def check_braces_sequence(s:str)->bool:
+    A_stack.clear()
+    for i in range(len(s)):
+        if s[i] in '[(':
+            A_stack.push(s[i])
+        else:
+            if not A_stack._stack:
+                return False
+            t=A_stack.pop()+s[i]
+            if t not in '()[]':
+                return False
+    return A_stack.is_empty()
 
-def pop():
-    return _stack.pop()
-
-def clear():
-    _stack.clear()
 
 if __name__=="__main__":
     from doctest import testmod
-    testmod(verbose=True)
+    print(testmod(verbose=True))
