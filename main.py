@@ -1,28 +1,19 @@
-"""
->>> check_braces_sequence('[((()))]')
-True
->>> check_braces_sequence('[(((()))]')
-False
->>> check_braces_sequence('[(((())))]')
-True
-"""
+from collections import deque
 
-import A_stack
-
-def check_braces_sequence(s:str)->bool:
-    A_stack.clear()
-    for i in range(len(s)):
-        if s[i] in '[(':
-            A_stack.push(s[i])
+def calc(s):
+    a=s.split(' ')
+    stack=deque()
+    for i in a:
+        if i.isdigit():
+            stack.append(int(i))
+        elif i.replace('.','').isdigit():
+            stack.append(float(i))
         else:
-            if not A_stack._stack:
-                return False
-            t=A_stack.pop()+s[i]
-            if t not in '()[]':
-                return False
-    return A_stack.is_empty()
+            if len(stack)>1:
+                t,p=stack.pop(),stack.pop()
+                stack.append(eval(f'{p}{i}{t}'))
+    return stack.pop() if stack else 0
 
 
-if __name__=="__main__":
-    from doctest import testmod
-    print(testmod(verbose=True))
+print(calc('5 1 2 + 4 * + 3 -'))
+print(calc("3.5"))
