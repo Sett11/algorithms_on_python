@@ -1,19 +1,35 @@
-from collections import deque
+class Linked_list:
+    def __init__(self,head=None):
+        self.head=head
 
-def calc(s):
-    a=s.split(' ')
-    stack=deque()
-    for i in a:
-        if i.isdigit():
-            stack.append(int(i))
-        elif i.replace('.','').isdigit():
-            stack.append(float(i))
-        else:
-            if len(stack)>1:
-                t,p=stack.pop(),stack.pop()
-                stack.append(eval(f'{p}{i}{t}'))
-    return stack.pop() if stack else 0
+    def repr(self):
+        node=self.head
+        nodes=[]
+        while node is not None:
+            nodes.append(node.value)
+            node=node.next
+        nodes.append('None')
+        return ' -> '.join(map(str,nodes))
 
 
-print(calc('5 1 2 + 4 * + 3 -'))
-print(calc("3.5"))
+class Node:
+    def __init__(self,value=0,next=None):
+        self.value=value
+        self.next=next
+    
+    def repr(self):
+        return self.value
+
+L=Linked_list()
+
+a=Node('a')
+
+L.head=a
+
+b=Node('b')
+c=Node('c')
+
+a.next=b
+b.next=c
+
+print(a.repr())
