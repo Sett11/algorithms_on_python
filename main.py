@@ -1,35 +1,31 @@
 class Linked_list:
     def __init__(self,head=None):
         self.head=head
-
-    def repr(self):
-        node=self.head
-        nodes=[]
-        while node is not None:
-            nodes.append(node.value)
-            node=node.next
-        nodes.append('None')
-        return ' -> '.join(map(str,nodes))
-
-
-class Node:
-    def __init__(self,value=0,next=None):
-        self.value=value
-        self.next=next
     
     def repr(self):
-        return self.value
+        h=self.head
+        r=[]
+        while h is not None:
+            r.append(h.val)
+            h=h.next
+        return ' -> '.join(map(str,r[:-1]))
+
+class Node:
+    def __init__(self,val=0,next=None):
+        self.val=val
+        self.next=next
+
+a=list(range(1,101))
 
 L=Linked_list()
+n=Node()
+c=n
 
-a=Node('a')
+for i in a:
+    c.val=i
+    c.next=Node()
+    c=c.next
 
-L.head=a
+L.head=n
 
-b=Node('b')
-c=Node('c')
-
-a.next=b
-b.next=c
-
-print(a.repr())
+print(L.repr())
