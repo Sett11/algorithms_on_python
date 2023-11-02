@@ -1,31 +1,28 @@
-class Linked_list:
-    def __init__(self,head=None):
-        self.head=head
+class Heap:
+    def __init__(self):
+        self.heap=[]
+
+    def push(self,v):
+        self.heap.append(v)
+        self.check()
     
-    def repr(self):
-        h=self.head
-        r=[]
-        while h is not None:
-            r.append(h.val)
-            h=h.next
-        return ' -> '.join(map(str,r[:-1]))
+    def check(self):
+        i=len(self.heap)-1
+        while i:
+            if self.heap[i]<self.heap[(i-1)//2]:
+                self.heap[i],self.heap[(i-1)//2]=self.heap[(i-1)//2],self.heap[i]
+            i-=1
 
-class Node:
-    def __init__(self,val=0,next=None):
-        self.val=val
-        self.next=next
 
-a=list(range(1,101))
+H=Heap()
 
-L=Linked_list()
-n=Node()
-c=n
+H.push(46)
+H.push(15)
+H.push(3)
+H.push(4)
+H.push(21)
+H.push(79)
 
-for i in a:
-    c.val=i
-    c.next=Node()
-    c=c.next
+H.push(61)
 
-L.head=n
-
-print(L.repr())
+print(H.heap)
