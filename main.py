@@ -1,25 +1,50 @@
-def longestIncreasingPath(a):
-    n,m=len(a),len(a[0])
-    r=[]
+from collections import deque
 
-    def dfs(i,j,w,c):
-        if i<0 or i>=n or j<0 or j>=m or a[i][j]<=w:
-            r.append(c)
-            return
-        dfs(i+1,j,a[i][j],c+1)
-        dfs(i-1,j,a[i][j],c+1)
-        dfs(i,j+1,a[i][j],c+1)
-        dfs(i,j-1,a[i][j],c+1)
+def bfs_chess_knight(x,y):
+    letters='abcdefgh'
+    numbers='12345678'
+    g={i+j:set() for i in letters for j in numbers}
 
-    for i in range(n):
-        for j in range(m):
-            dfs(i,j,-1,0)
-            if n in a:
-                break
+    def add_g(v1,v2):
+        g[v1].add(v2)
+        g[v2].add(v1)
 
-    return max(r)
+    for i in range(8):
+        for j in range(8):
+            v1=letters[i]+numbers[j]
+            if 0<=i+2<8 and 0<=j+1<8:
+                v2=letters[i+2]+numbers[j+1]
+                add_g(v1,v2)
+            if 0<=i-2<8 and 0<=j+1<8:
+                v2=letters[i-2]+numbers[j+1]
+                add_g(v1,v2)
+            if 0<=i+1<8 and 0<=j+2<8:
+                v2=letters[i+1]+numbers[j+2]
+                add_g(v1,v2)
+            if 0<=i-1<8 and 0<=j+2<8:
+                v2=letters[i-1]+numbers[j+2]
+                add_g(v1,v2)
+
+    distances={i:None for i in g}
+    parents=distances.copy()
+
+    distances[x]=0
+    q=deque()
+    q.append(x)
+
+    while q:
+        v=q.popleft()
+        for i in g[v]:
+            if distances[i] is None:
+                distances[i]=distances[v]+1
+                parents[i]=v
+                q.append(i)
+    path=[y]
+    parrent=parents[y]
+    while not parrent is None:
+        path.append(parrent)
+        parrent=parents[parrent]
+    return path[::-1]
 
 
-print(longestIncreasingPath([[3,4,5],
-           [3,2,6],
-           [2,2,1]]))
+print(bfs_chess_knight('d4','f7'))
