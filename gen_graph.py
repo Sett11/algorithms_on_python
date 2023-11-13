@@ -19,3 +19,18 @@ def generate_chess_grafh():
                 v2=letters[i-1]+numbers[j+2]
                 add_g(v1,v2)
     return g
+
+def convert_two_dimensional_array_to_graph(a):
+    r=set(sum(a,[]))
+    g={i:set() for i in r}
+    add=lambda e,c:g[e].add(c) and g[c].add(e)
+
+    for i in r:
+        for j in a:
+            if i in j:
+                add(i,[k for k in j if k!=i][0])
+    
+    return g
+
+    return g
+
