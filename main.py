@@ -1,33 +1,27 @@
 from collections import deque
-from gen_graph import generate_chess_grafh,convert_two_dimensional_array_to_graph
 
+g={'A':{'B':2,'H':15},
+   'B':{'C':1,'D':5},
+   'C':{'B':1,'D':3,'G':1,'F':2},
+   'D':{'C':3,'F':4,'E':6},
+   'G':{'C':1,'F':1},
+   'F':{'C':2,'G':1,'D':4,'E':7,'H':3},
+   'E':{'F':7,'D':6,'I':2},
+   'I':{'E':2,'H':12},
+   'H':{'A':15,'I':12}}
 
-def bfs(x,y):
-    g=generate_chess_grafh()
-
-    distances={i:None for i in g}
-    parents=distances.copy()
-    distances[x]=0
-    q=deque()
-    q.append(x)
+def dijcstra(s,e):
+    q=deque([s])
+    w={s:0}
 
     while q:
         v=q.popleft()
         for i in g[v]:
-            if distances[i] is None:
-                distances[i]=distances[v]+1
-                parents[i]=v
-                q.append(i)
+            t=w[v]+g[v][i]
+            if i not in w or t<w[i]:
+                w[i]=t
+                q.appendleft(i)
     
-    path=[y]
-    parrent=parents[y]
+    return w
 
-    while not parrent is None:
-        path.append(parrent)
-        parrent=parents[parrent]
-    
-    return path[::-1]
-
-
-print(convert_two_dimensional_array_to_graph([[1,2],[2,3],[3,4],[1,4],[1,5]]))
-print(convert_two_dimensional_array_to_graph([[9,10],[5,8],[2,6],[1,5],[3,8],[4,9],[8,10],[4,10],[ 6,8],[7,9]]))
+print(dijcstra('A','I'))
