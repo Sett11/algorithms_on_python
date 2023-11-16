@@ -1,30 +1,21 @@
-from collections import deque
-from gen_graph import generate_chess_bishop_graph
+def count_island(a):
+    n=len(a)
+    s=set()
 
+    def dfs(i):
+        if i not in s:
+            s.add(i)
+            for j in range(n):
+                if a[i][j]:
+                    dfs(j)
 
-def bst(x,y):
-    g=generate_chess_bishop_graph()
-    distances={i:None for i in g}
-    parents=distances.copy()
-    distances[x]=0
-    q=deque([x])
+    c=0
 
-    while q:
-        v=q.popleft()
-        for i in g[v]:
-            if distances[i] is None:
-                distances[i]=distances[v]+1
-                parents[i]=v
-                q.append(i)
-    
-    path=[y]
-    parent=parents[y]
+    for i in range(n):
+        if i not in s:
+            dfs(i)
+            c+=1
 
-    while not parent is None:
-        path.append(parent)
-        parent=parents[parent]
+    return c
 
-    return path[::-1]
-
-
-print(bst('a1','e3'))
+print(count_island([[1,1,0],[1,1,0],[0,0,1]]))
