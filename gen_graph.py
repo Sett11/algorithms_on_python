@@ -35,6 +35,34 @@ def generate_chess_bishop_graph():
     
     return g
 
+def convert_array_to_graph(a):
+    n,m=len(a),len(a[0])
+    g={}
+
+    for i in range(n):
+        for j in range(m):
+            x=(i,j)
+            g[x]={}
+            r=[[(t,k),a[t][k]] for t,k in [[i+1,j],[i-1,j],[i,j+1],[i,j-1],[i+1,j+1],[i-1,j-1],[i+1,j-1],[i-1,j+1]] if t>=0 and k>=0 and t<n and k<m]
+            for b,c in r:
+                g[x][b]=c+a[i][j]
+
+    return g
+
+
+def convert_two_dimensional_array_to_graph(a):
+    r=set(sum(a,[]))
+    g={i:set() for i in r}
+    add=lambda e,c:g[e].add(c) and g[c].add(e)
+
+    for i in r:
+        for j in a:
+            if i in j:
+                add(i,[k for k in j if k!=i][0])
+    
+    return g
+
+
 d_graph={'A':{'B':2,'H':15},
    'B':{'C':1,'D':5,'Z':5},
    'C':{'B':1,'D':3,'G':1,'F':2},
