@@ -1,9 +1,15 @@
-h=sorted(2**i*3**j*5**k for i in range(35) for j in range(25) for k in range(15))
+def fib(n):
 
-def hamming(n):
-    return h[n-1]
+    def f(x):
+        if not x:
+            return [0,1]
+        if x==1:
+            return [1,1]
+        a,b=f(x//2)
+        p,t=a*(2*b-a),a*a+b*b
+        return [p,t] if x%2==0 else [t,t+p]
+    
+    return f(n)[0] if n>=0 else -f(-n)[0] if n%2==0 else f(-n)[0]
 
-
-print(hamming(4))
-print(hamming(5))
-print(hamming(1099))
+print(fib(-96))
+print(fib(10))
