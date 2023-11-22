@@ -1,15 +1,8 @@
-def fib(n):
+def gcd(a,b):
+    return a if not b else gcd(b,a%b)
 
-    def f(x):
-        if not x:
-            return [0,1]
-        if x==1:
-            return [1,1]
-        a,b=f(x//2)
-        p,t=a*(2*b-a),a*a+b*b
-        return [p,t] if x%2==0 else [t,t+p]
-    
-    return f(n)[0] if n>=0 else -f(-n)[0] if n%2==0 else f(-n)[0]
+def lcm(a,b):
+    n=gcd(a,b)
+    return a*b/n if n else 0
 
-print(fib(-96))
-print(fib(10))
+print(lcm(18,15))
