@@ -1,50 +1,31 @@
-from random import shuffle
+from math import inf
+from gen_graph import p_graph
 
-def merge(a,b):
-    n,m=len(a),len(b)
-    r=[0]*(n+m)
-    i=j=k=0
+def get_min(R,U):
+    rm=(inf,'Z','Z')
 
-    while i<n and j<m:
-        if a[i]<=b[j]:
-            r[k]=a[i]
-            i+=1
-        else:
-            r[k]=b[j]
-            j+=1
-        k+=1
+    for v in U:
+        rr=min(R,key=lambda x: x[0] if (x[1]==v or x[2]==v) and (x[1] not in U or x[2] not in U) else inf)
+        if rm[0]>rr[0]:
+            rm=rr
     
-    while i<n:
-        r[k]=a[i]
-        i+=1
-        k+=1
+    return rm
 
-    while j<m:
-        r[k]=b[j]
-        j+=1
-        k+=1
+def prim(a):
+    s=list(set(''.join([i[1]+i[2] for i in a])))
+    n=len(s)
+    a=[(inf,'Z','Z')]+a
+    u={s[0]}
+    r=[]
+
+    while len(u)<n:
+        m=get_min(a,u)
+        if m[0]==inf:
+            break
+        r.append(m)
+        u.update([m[1],m[2]])
 
     return r
 
 
-def merge_sort(a):
-    n=len(a)
-    if n<2:
-        return
-    m=n//2
-    l=[a[i] for i in range(m)]
-    r=[a[i] for i in range(m,n)]
-    merge_sort(l)
-    merge_sort(r)
-    c=merge(l,r)
-
-    for i in range(len(c)):
-        a[i]=c[i]
-
-    return a
-
-q=list(range(1002))
-shuffle(q)
-
-
-print(merge_sort(q))
+print(prim(p_graph))
