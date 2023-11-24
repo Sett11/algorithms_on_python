@@ -1,31 +1,7 @@
-from math import inf
-from gen_graph import p_graph
-
-def get_min(R,U):
-    rm=(inf,'Z','Z')
-
-    for v in U:
-        rr=min(R,key=lambda x: x[0] if (x[1]==v or x[2]==v) and (x[1] not in U or x[2] not in U) else inf)
-        if rm[0]>rr[0]:
-            rm=rr
+def matrix_product(a,b):
+    if len(a[0])==len(b):
+        return [[sum(a[i][j]*b[j][k] for j in range(len(b))) for k in range(len(b[0]))] for i in range(len(a))]
     
-    return rm
 
-def prim(a):
-    s=list(set(''.join([i[1]+i[2] for i in a])))
-    n=len(s)
-    a=[(inf,'Z','Z')]+a
-    u={s[0]}
-    r=[]
-
-    while len(u)<n:
-        m=get_min(a,u)
-        if m[0]==inf:
-            break
-        r.append(m)
-        u.update([m[1],m[2]])
-
-    return r
-
-
-print(prim(p_graph))
+print(matrix_product([[1, 2], [3, 4]], [[5, 6], [7, 8]]))
+print(matrix_product([[0.5, 1],[1.5, 2]], [[0.2, 0.4], [0.6, 0.8]]))
