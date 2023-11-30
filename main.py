@@ -1,28 +1,20 @@
-from random import randint
+def manaker_palindrom(s):
+    t='#'.join('^{}$'.format(s))
+    n=len(t)
+    p=[0]*n
+    c=r=0
 
-def miller_rabin_test(n,k=5):
-    if n<2:
-        return False
-    if n<4:
-        return True
-    
-    r,s=0,n-1
+    for i in range(1,n-1):
+        p[i]=(r>i) and min(r-i,p[2*c-i])
+        while t[i+1+p[i]]==t[i-1-p[i]]:
+            p[i]+=1
+        if i+p[i]>r:
+            c,r=i,i+p[i]
 
-    while s%2==0:
-        r+=1
-        s//=2
+    x,y=max((i,j) for j,i in enumerate(p))
 
-    for _ in range(k):
-        a=randint(2,n-1)
-        x=pow(a,s,n)
-        if x==1 or x==n-1:
-            continue
-        for __ in range(r-1):
-            x=pow(x,2,n)
-            if x==n-1:
-                break
-        else:
-            return False
-    return True
+    return s[(y-x)//2:(x+y)//2]
 
-print(miller_rabin_test(997))
+
+print(manaker_palindrom('jddddjuudjjjdjjjuuudujuudjjjjujdduujduujjujdudjjuuuuuddjjjddddjdj'))
+print(manaker_palindrom('ttaaftffftfaafatf'))

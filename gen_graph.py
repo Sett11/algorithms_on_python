@@ -64,7 +64,7 @@ def convert_two_dimensional_array_to_graph(a):
 
 
 d_graph={'A':{'B':2,'H':15},
-   'B':{'C':1,'D':5,'Z':5},
+   'B':{'C':1,'D':5,'Z':5,'A':2},
    'C':{'B':1,'D':3,'G':1,'F':2},
    'D':{'C':3,'F':4,'E':6},
    'G':{'C':1,'F':1},
