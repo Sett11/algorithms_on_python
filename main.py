@@ -1,20 +1,19 @@
-def manaker_palindrom(s):
-    t='#'.join('^{}$'.format(s))
-    n=len(t)
-    p=[0]*n
-    c=r=0
+def generate_parenthesis(n):
+    r=[]
 
-    for i in range(1,n-1):
-        p[i]=(r>i) and min(r-i,p[2*c-i])
-        while t[i+1+p[i]]==t[i-1-p[i]]:
-            p[i]+=1
-        if i+p[i]>r:
-            c,r=i,i+p[i]
+    def f(s,n,m):
+        if [n,m]==[0,0]:
+            r.append(s)
+            return
+        if not n:
+            r.append(s+')'*m)
+            return
+        if n<m:
+            f(s+')',n,m-1)
+        f(s+'(',n-1,m)
+    
+    f('',n,n)
 
-    x,y=max((i,j) for j,i in enumerate(p))
+    return r
 
-    return s[(y-x)//2:(x+y)//2]
-
-
-print(manaker_palindrom('jddddjuudjjjdjjjuuudujuudjjjjujdduujduujjujdudjjuuuuuddjjjddddjdj'))
-print(manaker_palindrom('ttaaftffftfaafatf'))
+print(generate_parenthesis(5))
