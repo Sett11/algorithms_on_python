@@ -1,19 +1,19 @@
-def generate_parenthesis(n):
-    r=[]
+from collections import defaultdict
 
-    def f(s,n,m):
-        if [n,m]==[0,0]:
-            r.append(s)
-            return
-        if not n:
-            r.append(s+')'*m)
-            return
-        if n<m:
-            f(s+')',n,m-1)
-        f(s+'(',n-1,m)
-    
-    f('',n,n)
+def longest_arithSeq_length(self,a):
+    o=defaultdict(dict)
+    c=1
 
-    return r
+    for i in range(len(a)):
+        for j in range(i):
+            n=a[i]-a[j]
+            if n not in o[j]:
+                o[j][n]=1
+            if n not in o[i]:
+                o[i][n]=0
+            o[i][n]=o[j][n]+1
+            c=max(c,o[i][n])
 
-print(generate_parenthesis(5))
+    return c
+
+print(longest_arithSeq_length([9,4,7,2,10]))
