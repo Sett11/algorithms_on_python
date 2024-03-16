@@ -2,18 +2,20 @@ from random import shuffle,choice#,randint
 from re import sub
 from math import ceil, inf
 from collections import defaultdict, deque
-from string import ascii_uppercase
-from gen_graph import matrix, dfs_a, dfs_b, generate_chess_knight_grafh, p_graph as g, d_graph as dg
+from string import ascii_uppercase,digits
+from gen_graph import matrix, dfs_a, dfs_b, seq, generate_chess_knight_grafh, p_graph as g, d_graph as dg
+from pprint import pprint
 
+def find_longest_substring_bracket(s):
+    stask,m=[-1],0
+    for i,j in enumerate(s):
+        if j=='(':
+            stask.append(i)
+        else:
+            stask.pop()
+            if stask:m=max(m,i-stask[-1])
+            else:
+                stask.append(i)
+    return m
 
-def f(n,m):
-    a,r=list(range(n*m,0,-1)),[[0]*m for _ in range(n)]
-    for i in range(n+m-1):
-        k,j=0 if i<m else i-m+1,i if i<m else m-1
-        while k<n and j>=0:
-            r[k][j]=a.pop()
-            k+=1
-            j-=1
-    return r
-
-print(f(4,5))
+pprint(find_longest_substring_bracket(')(())()()'),width=50,indent=3)
