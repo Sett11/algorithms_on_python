@@ -3,15 +3,17 @@ from re import sub
 from math import ceil, inf
 from collections import defaultdict, deque
 from string import ascii_uppercase,digits
-from gen_graph import matrix, dfs_a, dfs_b, seq, generate_chess_knight_grafh, p_graph as g, d_graph as dg
+from gen_graph import matrix, dfs_a, dfs_b, seq, seq_p, generate_chess_knight_grafh, p_graph as g, d_graph as dg
 from pprint import pprint
 
 
-def integer_partition(n):
-    d=[1]+[0]*n
-    for i in range(1,n+1):
-        for j in range(i,n+1):
-            d[j]+=d[j-i]
-    return d[-1]
+def prime_fac(n):
+    r,i=[],2
+    while i<n**2:
+        while n%i==0:
+            r.append(i)
+            n//=i
+        i+=1
+    return r
 
-print(integer_partition(100))
+print(prime_fac(94080000))
