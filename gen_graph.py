@@ -1,3 +1,5 @@
+from math import inf
+
 def generate_chess_knight_grafh():
     letters,numbers='abcdefgh','12345678'
     g={i+j:set() for i in letters for j in numbers}
@@ -76,7 +78,14 @@ d_graph={'A':{'B':2,'H':15},
 
 
 p_graph=[[1, 'A', 'B'], [1, 'A', 'E'], [1, 'B', 'A'], [1, 'E', 'A'], [1, 'G', 'H'], [1, 'H', 'G'], [2, 'A', 'F'], [2, 'D', 'E'], [2, 'D', 'H'], [2, 'E', 'D'], [2, 'F', 'A'], [2, 'F', 'G'], [2, 'G', 'F'], [2, 'H', 'D'], [3, 'B', 'E'], [3, 'C', 'D'], [3, 'D', 'C'], [3, 'E', 'B'], [4, 'D', 'G'], [4, 'E', 'F'], [4, 'F', 'E'], [4, 'G', 'D'], [5, 'A', 'H'], [5, 'B', 'F'], [5, 'F', 'B'], [5, 'H', 'A'], [6, 'B', 'C'], [6, 'C', 'B'], [7, 'C', 'H'], [7, 'H', 'C'], [8, 'C', 'G'], [8, 'G', 'C']]
-k_graph = [(13, 1, 2), (18, 1, 3), (17, 1, 4), (14, 1, 5), (22, 1, 6), (26, 2, 3), (22, 2, 5), (3, 3, 4), (19, 4, 6)]
+f_grapf=[[0, 2, inf, 3, 1, inf, inf, 10],
+         [2, 0, 4, inf, inf, inf, inf, inf],
+         [inf, 4, 0, inf, inf, inf, inf, 3],
+         [3, inf, inf, 0, inf, inf, inf, 8],
+         [1, inf, inf, inf, 0, 2, inf, inf],
+         [inf, inf, inf, inf, 2, 0, 3, inf],
+         [inf, inf, inf, inf, inf, 3, 0, 1],
+         [10, inf, 3, 8, inf, inf, 1, 0],]
 
 dfs_a=[[1,1,0,0],[1,1,0,0],[0,1,1,1]]
 dfs_b=[[1,1,0,0],[1,1,0,0],[0,0,1,1]]
