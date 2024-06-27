@@ -10,24 +10,7 @@ from operator import mul
 from random import shuffle,choice#,randint
 
 
-def get_path(a,i,j):
-    r=[i]
-    while i!=j:
-        i=a[i][j]
-        r.append(i)
-    return r
+def bit_sum(a,b):
+    return a if not b else bit_sum(a^b,(a&b)<<1)
 
-def floyd(a,x,y):
-    n=len(a)
-    r=[[i for i in range(n)] for _ in range(n)]
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                v=a[i][k]+a[k][j]
-                if a[i][j]>v:
-                    a[i][j]=v
-                    r[i][j]=k
-    return get_path(r,y,x)
-
-
-print(floyd(fg,4,1))
+print(bit_sum(5,7))
