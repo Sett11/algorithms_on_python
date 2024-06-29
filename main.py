@@ -10,7 +10,22 @@ from operator import mul
 from random import shuffle,choice#,randint
 
 
-def bit_sum(a,b):
-    return a if not b else bit_sum(a^b,(a&b)<<1)
+def gen_gray_code(n):
+    a,r,j=[0]*(n+1),[],0
+    while True:
+        r.append(''.join(map(str,a[n-1::-1])))
+        a[n]=1-a[n]
+        if a[n]==1:
+            j=0
+        else:
+            for i in range(n):
+                if a[i]==1:
+                    j=i+1
+                    break
+        if j>=n:
+            break
+        a[j]=1-a[j]
+    return r
 
-print(bit_sum(5,7))
+
+print(*gen_gray_code(3),sep='\n')
