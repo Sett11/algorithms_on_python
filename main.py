@@ -10,59 +10,53 @@ from operator import mul
 from random import shuffle,choice#,randint
 
 
-def get_max_vertex(k,a,s):
-    m,v=0,-1
-    for i,j in enumerate(a[k]):
-        if i in s:
-            continue
-        if j[2]==1:
-            if m<j[0]:
-                m=j[0]
-                v=i
-        else:
-            if m<j[1]:
-                m=j[1]
-                v=i
-    return v
+class Node:
+    def __init__(self,data=None,left=None,right=None):
+        self.data=data
+        self.left=left
+        self.right=right
+    def __repr__(self):
+        return f'Node({self.data}, {self.left}, {self.right})'
+    
+a,b,c,d,e=Node(1),Node(2),Node(3),Node(4),Node(5)
+a.left=b
+a.right=c
+b.left=d
+c.right=e
 
-def get_max_flow(t):
-    return min(*[x[0] for x in t])
+def pre_order(h):
+    r=[]
+    def f(x):
+        if not x:
+            return
+        r.append(x.data)
+        f(x.left)
+        f(x.right)
+    f(h)
+    return r
 
-def updateV(v,t,f):
-    for i in t:
-        if i[1]==-1:
-            continue
-        sgn=v[i[2]][i[1]][2]
-        v[i[1]][i[2]][0]-=f*sgn
-        v[i[1]][i[2]][1]+=f*sgn
-        v[i[2]][i[1]][0]-=f*sgn
-        v[i[2]][i[1]][1]+=f*sgn
+def in_order(h):
+    r=[]
+    def f(x):
+        if not x:
+            return
+        f(x.left)
+        r.append(x.data)
+        f(x.right)
+    f(h)
+    return r
 
-def ford_fulkerson(a,init,end):
-    tinit=(inf,-1,init)
-    f=[]
-    j=init
-    while j!=-1:
-        k=init
-        t=[tinit]
-        s={init}
-        while k!=end:
-            j=get_max_vertex(k,a,s)
-            if j==-1:
-                if k==init:
-                    break
-                else:
-                    k=t.pop()[2]
-                    continue
-            c=a[k][j][0] if a[k][j][2]==1 else a[k][j][1]
-            t.append((c,j,k))
-            s.add(j)
-            if j==end:
-                f.append(get_max_flow(t))
-                updateV(a,t,f[-1])
-                break
-            k=j
-    return sum(f)
+def post_order(h):
+    r=[]
+    def f(x):
+        if not x:
+            return
+        f(x.left)
+        f(x.right)
+        r.append(x.data)
+    f(h)
+    return r
 
-
-print(ford_fulkerson(ff_g,0,4))
+print(pre_order(a))
+print(in_order(a))
+print(post_order(a))
