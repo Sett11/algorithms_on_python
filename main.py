@@ -10,53 +10,7 @@ from operator import mul
 from random import shuffle,choice#,randint
 
 
-class Node:
-    def __init__(self,data=None,left=None,right=None):
-        self.data=data
-        self.left=left
-        self.right=right
-    def __repr__(self):
-        return f'Node({self.data}, {self.left}, {self.right})'
-    
-a,b,c,d,e=Node(1),Node(2),Node(3),Node(4),Node(5)
-a.left=b
-a.right=c
-b.left=d
-c.right=e
+def range_sum(a,b):
+    return (a+b)*(b-a+1)//2
 
-def pre_order(h):
-    r=[]
-    def f(x):
-        if not x:
-            return
-        r.append(x.data)
-        f(x.left)
-        f(x.right)
-    f(h)
-    return r
-
-def in_order(h):
-    r=[]
-    def f(x):
-        if not x:
-            return
-        f(x.left)
-        r.append(x.data)
-        f(x.right)
-    f(h)
-    return r
-
-def post_order(h):
-    r=[]
-    def f(x):
-        if not x:
-            return
-        f(x.left)
-        f(x.right)
-        r.append(x.data)
-    f(h)
-    return r
-
-print(pre_order(a))
-print(in_order(a))
-print(post_order(a))
+print(range_sum(666,1090987780))
