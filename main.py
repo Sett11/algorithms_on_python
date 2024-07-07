@@ -11,11 +11,10 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-def pisano_mod_10(n):
-    n%=60
-    a,b=0,1
-    for _ in range(n):
-        a,b=b,a+b
-    return (a*b)%10
+def factorial(n):
+    return 1 if n<=1 else n*factorial(n-1)
 
-print(pisano_mod_10(10000000))
+def count_combinations(n,m):
+    return factorial(n)//(factorial(m)*factorial(n-m))
+
+print(count_combinations(10,5))
