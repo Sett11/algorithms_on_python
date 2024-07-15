@@ -8,13 +8,36 @@ from itertools import product
 from operator import mul
 from random import shuffle,choice#,randint
 q=list(range(1,1503))
-shuffle(q)
+shuffle(q)        
 
 
-def factorial(n):
-    return 1 if n<=1 else n*factorial(n-1)
+def knuth_morris_pratt(s,t):
+    n,m=len(s),len(t)
+    p=[0]*m
+    i,j=1,0
+    while i<m:
+        if t[i]==t[j]:
+            p[i]=j+1
+            i+=1
+            j+=1
+        else:
+            if j==0:
+                p[i]=0
+                i+=1
+            else:
+                j=p[j-1]
+    i=j=0
+    while i<n:
+        if s[i]==t[j]:
+            i+=1
+            j+=1
+            if j==m:
+                return i-m
+        else:
+            if j>0:
+                j=p[j-1]
+            else:
+                i+=1
+    return 'Not found...'
 
-def count_combinations(n,m):
-    return factorial(n)//(factorial(m)*factorial(n-m))
-
-print(count_combinations(10,5))
+print(knuth_morris_pratt('aunntlammauaujjdau','lamm'))
