@@ -11,33 +11,16 @@ q=list(range(1,1503))
 shuffle(q)        
 
 
-def knuth_morris_pratt(s,t):
-    n,m=len(s),len(t)
-    p=[0]*m
-    i,j=1,0
-    while i<m:
-        if t[i]==t[j]:
-            p[i]=j+1
-            i+=1
-            j+=1
-        else:
-            if j==0:
-                p[i]=0
-                i+=1
-            else:
-                j=p[j-1]
-    i=j=0
-    while i<n:
-        if s[i]==t[j]:
-            i+=1
-            j+=1
-            if j==m:
-                return i-m
-        else:
-            if j>0:
-                j=p[j-1]
-            else:
-                i+=1
-    return 'Not found...'
+def ulam_sequence(a,b,n):
+    sq,r=[0]*1000000,[a,b]
+    sq[a+b]=1
+    i=a+b
+    while len(r)<n:
+        if sq[i]==1:
+            for j in r:
+                sq[i+j]+=1
+            r.append(i)
+        i+=1
+    return r
 
-print(knuth_morris_pratt('aunntlammauaujjdau','lamm'))
+print(ulam_sequence(2,5,300))
