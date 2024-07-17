@@ -8,19 +8,36 @@ from itertools import product
 from operator import mul
 from random import shuffle,choice#,randint
 q=list(range(1,1503))
-shuffle(q)        
+shuffle(q)
 
 
-def ulam_sequence(a,b,n):
-    sq,r=[0]*1000000,[a,b]
-    sq[a+b]=1
-    i=a+b
-    while len(r)<n:
-        if sq[i]==1:
-            for j in r:
-                sq[i+j]+=1
-            r.append(i)
-        i+=1
-    return r
+def boyer_moore_horspool(s,t):
+    n,m,u,d=len(s),len(t),set(),{}
+    for i in range(m-2,-1,-1):
+        if t[i] not in u:
+            d[t[i]]=m-i-1
+            u.add(t[i])
+    if t[-1] not in u:
+        d[t[-1]]=m
+    if n>=m:
+        i=m-1
+        while i<n:
+            j=k=0
+            v=False
+            for j in range(m-1,-1,-1):
+                if s[i-k]!=t[j]:
+                    if j==m-1:
+                        off=d.get(s[i],m)
+                    else:
+                        off=d[t[j]]
+                    i+=off
+                    v=True
+                    break
+                k+=1
+            if not v:
+                return i-k+1
+    return 'Not found...'
 
-print(ulam_sequence(2,5,300))
+
+
+print(boyer_moore_horspool('nejvneoqhjvncjvbehjkbv jhkd,bv hjkvb hjkd,bv hrkdvb hk','hjkvb '))
