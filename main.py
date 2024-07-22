@@ -11,33 +11,20 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-def boyer_moore_horspool(s,t):
-    n,m,u,d=len(s),len(t),set(),{}
-    for i in range(m-2,-1,-1):
-        if t[i] not in u:
-            d[t[i]]=m-i-1
-            u.add(t[i])
-    if t[-1] not in u:
-        d[t[-1]]=m
-    if n>=m:
-        i=m-1
-        while i<n:
-            j=k=0
-            v=False
-            for j in range(m-1,-1,-1):
-                if s[i-k]!=t[j]:
-                    if j==m-1:
-                        off=d.get(s[i],m)
-                    else:
-                        off=d[t[j]]
-                    i+=off
-                    v=True
-                    break
-                k+=1
-            if not v:
-                return i-k+1
-    return 'Not found...'
+def comb(a,r):
+    p,res=tuple(a),[]
+    n=len(p)
+    if not n and r:
+        return
+    t=[0]*r
+    res.append(tuple(p[i] for i in t))
+    while True:
+        for i in reversed(range(r)):
+            if t[i]!=n-1:
+                break
+        else:
+            return res
+        t[i:]=[t[i]+1]*(r-i)
+        res.append(tuple(p[i] for i in t))
 
-
-
-print(boyer_moore_horspool('nejvneoqhjvncjvbehjkbv jhkd,bv hjkvb hjkd,bv hrkdvb hk','hjkvb '))
+print(comb([1,2,3,4,5],3))
