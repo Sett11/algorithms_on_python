@@ -12,15 +12,17 @@ shuffle(q)
 
 
 def comb(a,r):
-    p,n,t,res=tuple(a),len(a),[0]*r,[]
+    p,n,t,res=tuple(a),len(a),list(range(r)),[]
     f=lambda:res.append(tuple(p[i] for i in t))
     while 1:
         f()
         for i in reversed(range(r)):
-            if t[i]!=n-1:
+            if t[i]!=i+n-r:
                 break
         else:
             return res
-        t[i:]=[t[i]+1]*(r-i)
+        t[i]+=1
+        for j in range(i+1,r):
+            t[j]=t[j-1]+1
 
-print(comb([1,2,3,4],2))
+print(comb([1,2,3,4,5],3))
