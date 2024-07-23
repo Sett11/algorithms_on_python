@@ -11,18 +11,16 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-def g(a,r):
-    p,n,res=tuple(a),len(a),[]
-    t=[0]*r
+def comb(a,r):
+    p,n,t,res=tuple(a),len(a),[0]*r,[]
     f=lambda:res.append(tuple(p[i] for i in t))
-    f()
     while 1:
+        f()
         for i in reversed(range(r)):
             if t[i]!=n-1:
                 break
         else:
             return res
         t[i:]=[t[i]+1]*(r-i)
-        f()
 
-print(g([1,2,3,4],2))
+print(comb([1,2,3,4],2))
