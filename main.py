@@ -11,33 +11,45 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-class Queue:
-    def __init__(self,queue=[]):
-        self.queue=queue
-        self.size=len(queue)
-        self.pointer=0
 
+class Deque:
+    def __init__(self,deque=[]):
+        self.deque=deque
+        self.size=len(deque)
+        self.pointer_left=0
+        self.pointer_right=self.size-1
+    
     def push(self,v):
-        self.queue.append(v)
+        self.deque.append(v)
         self.size+=1
+        self.pointer_right+=1
     
-    def pop(self):
-        if self.size:
-            x=self.queue[self.pointer]
-            self.queue[self.pointer]=0
-            self.pointer+=1
+    def pop_left(self):
+        if self.pointer_left<=self.pointer_right:
+            x=self.deque[self.pointer_left]
+            self.deque[self.pointer_left]=0
             self.size-=1
+            self.pointer_left+=1
             return x
-    
-    def peek(self):
+        
+    def pop_right(self):
+        if self.pointer_right>=self.pointer_left:
+            self.size-=1
+            self.pointer_right-=1
+            return self.deque.pop()
+        
+    def peek_left(self):
         if self.size:
-            return self.queue[self.pointer]
+            return self.deque[self.pointer_left]
     
-q=Queue()
+    def peek_right(self):
+        if self.size:
+            return self.deque[self.pointer_right]
+        
+q=Deque()
 q.push(1)
 q.push(2)
 q.push(3)
 q.push(4)
 q.push(5)
-
-print(q.pop(),q.pop(),q.pop(),q.pop(),q.pop(),q.push(9),q.pop(),q.peek(),q.queue)
+print(q.pop_left(),q.peek_left(),q.pop_right(),q.peek_right(),q.pop_left(),q.pop_right(),q.pop_left(),q.push(9),q.peek_right())
