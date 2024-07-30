@@ -1,4 +1,5 @@
 from math import inf
+from operator import mul,add,sub,truediv
 
 def generate_chess_knight_grafh():
     letters,numbers='abcdefgh','12345678'
@@ -109,3 +110,4 @@ matrix=[
     [8, 4, 3, 9, 2, 5, 8]]
 
 exp='((7+3)*(((5-2)+2)*3))'
+exp_dict={'+':add,'-':sub,'*':mul,'/':truediv}
