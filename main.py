@@ -11,26 +11,33 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-class Stack:
-    def __init__(self,stack=[]):
-        self.stack=stack
-        self.size=len(stack)
-    
+class Queue:
+    def __init__(self,queue=[]):
+        self.queue=queue
+        self.size=len(queue)
+        self.pointer=0
+
     def push(self,v):
-        self.stack.append(v)
+        self.queue.append(v)
         self.size+=1
     
     def pop(self):
-        self.size-=1
-        return self.stack.pop()
-    
-    def is_empty(self):
-        return not self.stack
+        if self.size:
+            x=self.queue[self.pointer]
+            self.queue[self.pointer]=0
+            self.pointer+=1
+            self.size-=1
+            return x
     
     def peek(self):
-        return self.stack[-1] if not self.is_empty() else None
+        if self.size:
+            return self.queue[self.pointer]
     
-s=Stack()
-s.push(2)
-s.push(3)
-print(s.peek(),s.pop(),s.size)
+q=Queue()
+q.push(1)
+q.push(2)
+q.push(3)
+q.push(4)
+q.push(5)
+
+print(q.pop(),q.pop(),q.pop(),q.pop(),q.pop(),q.push(9),q.pop(),q.peek(),q.queue)
