@@ -11,57 +11,59 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-class BinHeap:
-    def __init__(self):
-        self.heap_list=[0]
-        self.size=0
+class PrefixTree:
+    def __init__(self,key=None,parent=None):
+        self.key=key
+        self.parent=parent
+        self.children={}
+        self.end=False
+    
+    def get_word(self):
+        r,h=[],self
+        if h is not None:
+            r.insert(0,h.key)
+            h=h.parent
+        return ''.join(r)
+    
+    def contain(self,s):
+        h=self
+        for i in s:
+            if i in h.children:
+                h=h.children[i]
+            else:
+                return False
+        return h.end
+    
+    def insert(self,s):
+        h=self
+        for i in s:
+            if i not in h.children:
+                h.children[i]=PrefixTree(i,h)
+            h=h.children[i]
+        h.end=True
 
-    def perc_up(self,i):
-        while i//2:
-            if self.heap_list[i]<self.heap_list[i//2]:
-                self.heap_list[i],self.heap_list[i//2]=self.heap_list[i//2],self.heap_list[i]
-            i//=2
-    
-    def insert(self,v):
-        self.size+=1
-        self.heap_list.append(v)
-        self.perc_up(self.size)
+    def remove(self,s):
+        h=self
+        def find_word(h,s,i):
+            if i==len(s):
+                if not h.end:
+                    return False
+                h.end=False
+                return len(h.children)==0
+            if find_word(h.children[s[i]],s,i+1):
+                del h.children[s[i]]
+                return not h.end and len(h.children)==0
+            return False
+        find_word(h,s,0)
 
-    def perc_down(self,i):
-        while i*2<=self.size:
-            m=self.min_child(i)
-            if self.heap_list[i]>self.heap_list[m]:
-                self.heap_list[i],self.heap_list[m]=self.heap_list[m],self.heap_list[i]
-            i=m
-    
-    def min_child(self,i):
-        return i*2 if i*2+1>self.size or self.heap_list[i*2]<self.heap_list[i*2+1] else i*2+1
-    
-    def del_min(self):
-        x=self.heap_list[1]
-        self.heap_list[1]=self.heap_list[self.size]
-        self.size-=1
-        self.heap_list.pop()
-        self.perc_down(1)
-        return x
-    
-    def build_heap(self,a):
-        n=len(a)
-        i,self.size=n//2,n
-        self.heap_list=[0]+a[:]
-        while i:
-            self.perc_down(i)
-            i-=1
+    def __repr__(self):
+        return str(self.children)
 
-h=BinHeap()
-h.build_heap([9,5,6,2,3])
-print(h.heap_list)
-print(h.del_min())
-print(h.size)
-h.insert(12)
-print(h.heap_list)
-h.insert(1)
-print(h.heap_list)
-print(h.size)
-print(h.del_min())
-print(h.heap_list,h.size)
+p=PrefixTree()
+p.insert('Hell')
+p.insert('Hello')
+print(p.contain('Hello'),p.contain('Hell'))
+p.insert('World')
+p.remove('Hell')
+print(p.contain('Hell'))
+print(repr(p))
