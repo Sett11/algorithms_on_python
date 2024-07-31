@@ -11,45 +11,57 @@ q=list(range(1,1503))
 shuffle(q)
 
 
+class BinHeap:
+    def __init__(self):
+        self.heap_list=[0]
+        self.size=0
 
-class Deque:
-    def __init__(self,deque=[]):
-        self.deque=deque
-        self.size=len(deque)
-        self.pointer_left=0
-        self.pointer_right=self.size-1
+    def perc_up(self,i):
+        while i//2:
+            if self.heap_list[i]<self.heap_list[i//2]:
+                self.heap_list[i],self.heap_list[i//2]=self.heap_list[i//2],self.heap_list[i]
+            i//=2
     
-    def push(self,v):
-        self.deque.append(v)
+    def insert(self,v):
         self.size+=1
-        self.pointer_right+=1
+        self.heap_list.append(v)
+        self.perc_up(self.size)
+
+    def perc_down(self,i):
+        while i*2<=self.size:
+            m=self.min_child(i)
+            if self.heap_list[i]>self.heap_list[m]:
+                self.heap_list[i],self.heap_list[m]=self.heap_list[m],self.heap_list[i]
+            i=m
     
-    def pop_left(self):
-        if self.pointer_left<=self.pointer_right:
-            x=self.deque[self.pointer_left]
-            self.deque[self.pointer_left]=0
-            self.size-=1
-            self.pointer_left+=1
-            return x
-        
-    def pop_right(self):
-        if self.pointer_right>=self.pointer_left:
-            self.size-=1
-            self.pointer_right-=1
-            return self.deque.pop()
-        
-    def peek_left(self):
-        if self.size:
-            return self.deque[self.pointer_left]
+    def min_child(self,i):
+        return i*2 if i*2+1>self.size or self.heap_list[i*2]<self.heap_list[i*2+1] else i*2+1
     
-    def peek_right(self):
-        if self.size:
-            return self.deque[self.pointer_right]
-        
-q=Deque()
-q.push(1)
-q.push(2)
-q.push(3)
-q.push(4)
-q.push(5)
-print(q.pop_left(),q.peek_left(),q.pop_right(),q.peek_right(),q.pop_left(),q.pop_right(),q.pop_left(),q.push(9),q.peek_right())
+    def del_min(self):
+        x=self.heap_list[1]
+        self.heap_list[1]=self.heap_list[self.size]
+        self.size-=1
+        self.heap_list.pop()
+        self.perc_down(1)
+        return x
+    
+    def build_heap(self,a):
+        n=len(a)
+        i,self.size=n//2,n
+        self.heap_list=[0]+a[:]
+        while i:
+            self.perc_down(i)
+            i-=1
+
+h=BinHeap()
+h.build_heap([9,5,6,2,3])
+print(h.heap_list)
+print(h.del_min())
+print(h.size)
+h.insert(12)
+print(h.heap_list)
+h.insert(1)
+print(h.heap_list)
+print(h.size)
+print(h.del_min())
+print(h.heap_list,h.size)
