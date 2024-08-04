@@ -11,13 +11,40 @@ q=list(range(1,1503))
 shuffle(q)
 
 
-def optimal_number_of_coins(n,a):
-    r=[0]+[n+1]*n
-    for i in range(1,n+1):
-        for j in a:
-            if j<=i:
-                r[i]=min(r[i],r[i-j]+1)
-    return -1 if r[n]>n else r[n]
+class Stack:
+    def __init__(self,items=[],size=0):
+        self.items=items
+        self.size=size
 
+    def add(self,v):
+        self.size+=1
+        self.items.append(v)
+    
+    def pop_right(self):
+        self.size-=1
+        return self.items.pop()
+    
+class Queue(Stack):
+    def __init__(self):
+        super().__init__()
+        self.pointer=0
+    
+    def pop_left(self):
+        if self.size:
+            x=self.items[self.pointer]
+            self.items[self.pointer]=0
+            self.size-=1
+            self.pointer+=1
+            return x
+        
+class Deque(Queue,Stack):
+    def __init__(self):
+        super().__init__()
 
-print(optimal_number_of_coins(33,[1, 6, 9, 10]))
+q=Deque()
+q.add(1)
+q.add(2)
+q.add(3)
+q.add(4)
+q.add(5)
+print(q.pop_right(),q.pop_left(),q.size)
