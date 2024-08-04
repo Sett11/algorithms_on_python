@@ -10,51 +10,106 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
+class Node:
+    def __init__(self,val=None,previous=None,next=None):
+        self.val=val
+        self.previous=previous
+        self.next=next
 
-class Stack:
-    def __init__(self,items=[],size=0):
-        self.items=items
+class DoubleLinkedList:
+    def __init__(self,head=None,tail=None,size=0):
+        self.head=head
+        self.tail=tail
         self.size=size
 
-    def add(self,v):
+    def add_left(self,v):
+        if not self.head:
+            self.head=self.tail=Node(v)
+        else:
+            self.head.previous=self.head=Node(v,next=self.head)
         self.size+=1
-        self.items.append(v)
-    
-    def pop(self):
-        if self.size:
-            self.size-=1
-            return self.items.pop()
-    
-    def peek(self):
-        if self.size:
-            return self.items[-1]
-        
 
-class Queue(Stack):
-    def __init__(self):
-        super().__init__()
-        self.pointer=0
+    def add_right(self,v):
+        if not self.tail:
+            self.tail=self.head=Node(v)
+        else:
+            self.tail.next=self.tail=Node(v,previous=self.tail)
+        self.size+=1
     
     def pop_left(self):
-        if self.size:
-            x=self.items[self.pointer]
-            self.items[self.pointer]=0
-            self.pointer+=1
-            self.size-=1
-            return x
+        if not self.head:
+            return
+        x=self.head.val
+        if self.head==self.tail:
+            self.head=self.tail=None
+        else:
+            self.head=self.head.next
+            self.head.previous=None
+        self.size-=1
+        return x
     
-    def peek_left(self):
-        if self.size:
-            return self.items[self.pointer]
+    def pop_right(self):
+        if not self.tail:
+            return
+        x=self.tail.val
+        if self.head==self.tail:
+            self.head=self.tail=None
+        else:
+            self.tail=self.tail.previous
+            self.tail.next=None
+        self.size-=1
+        return x
+    
+    def __contains__(self,v):
+        h=self.head
+        while h:
+            if h.val==v:
+                return True
+            h=h.next
+    
+    def __iter__(self):
+        h=self.head
+        while h:
+            yield h.val
+            h=h.next
+    
+    def __repr__(self):
+        h,r=self.head,[]
+        while h:
+            r.append(str(h.val))
+            h=h.next
+        return ' -> '.join(r)
+    
+    def __add__(self,b):
+        if isinstance(b,DoubleLinkedList):
+            a,d=self,DoubleLinkedList()
+            d.head,d.tail=a.head,a.tail
+            a.tail.next=b.head
+            return d
         
-class Deque(Queue,Stack):
-    def __init__(self):
-        super().__init__()
+    def __eq__(self,b):
+        if isinstance(b,DoubleLinkedList) and self.size==b.size:
+            h,c=self.head,b.head
+            while h and c:
+                if h.val!=c.val:
+                    return False
+                h,c=h.next,c.next
+            return True
+    
+l=DoubleLinkedList()
+l.add_left(1)
+l.add_left(2)
+l.add_left(3)
+l.add_right(4)
+print([i for i in l],l.size)
+print(3 in l,l.pop_left(),l.pop_right())
+print(repr(l),l.size)
 
-q=Deque()
-q.add(1)
-q.add(2)
-q.add(3)
-q.add(4)
-q.add(5)
-print(q.pop(),q.pop_left(),q.size,q.peek(),q.peek_left())
+d=DoubleLinkedList()
+d.add_left(7)
+d.add_left(8)
+d.add_right(23)
+p=l+d
+x=p
+print(p)
+print(p==x)
