@@ -20,10 +20,16 @@ class Stack:
         self.size+=1
         self.items.append(v)
     
-    def pop_right(self):
-        self.size-=1
-        return self.items.pop()
+    def pop(self):
+        if self.size:
+            self.size-=1
+            return self.items.pop()
     
+    def peek(self):
+        if self.size:
+            return self.items[-1]
+        
+
 class Queue(Stack):
     def __init__(self):
         super().__init__()
@@ -33,9 +39,13 @@ class Queue(Stack):
         if self.size:
             x=self.items[self.pointer]
             self.items[self.pointer]=0
-            self.size-=1
             self.pointer+=1
+            self.size-=1
             return x
+    
+    def peek_left(self):
+        if self.size:
+            return self.items[self.pointer]
         
 class Deque(Queue,Stack):
     def __init__(self):
@@ -47,4 +57,4 @@ q.add(2)
 q.add(3)
 q.add(4)
 q.add(5)
-print(q.pop_right(),q.pop_left(),q.size)
+print(q.pop(),q.pop_left(),q.size,q.peek(),q.peek_left())
