@@ -12,25 +12,12 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-class LazyInit:
-    @classmethod
-    def lazy_init(msc,init):
-        def wrap(*args):
-            p=inspect.getfullargspec(init).args
-            self=args[0]
-            for i in range(1,len(p)):
-                setattr(self,p[i],args[i])
-        return wrap
-    
-    def __new__(msc,name,bases,attrs):
-        cls=type(name,bases,attrs)
-        setattr(cls,'__init__',LazyInit.lazy_init(attrs['__init__']))
-        return cls
-    
-class MyClass(metaclass=LazyInit):
-    def __init__(self,name,age):
-        pass
+def pack_bagpack(val,wt,w):
+    n,dp=len(val),[0]*(w+1)
+    for i in range(1,n+1):
+        for j in range(w,0,-1):
+            if wt[i-1]<=j:
+                dp[j]=max(dp[j],dp[j-wt[i-1]]+val[i-1])
+    return dp[w]
 
-m=MyClass('John',23)
-
-print(m.name)
+print(pack_bagpack([6,3,5,4,6],[2,2,6,5,4], 10))
