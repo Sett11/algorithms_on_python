@@ -12,7 +12,14 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-def count_sum_squares(n):
-    return n*(n+1)*(2*n+1)//6
+def knapsack(items,n):
+    dp = [(0, []) for _ in range(n+1)]
+    for item in items:
+        for w in range(n, 0, -1):
+            if item[0] <= w:
+                x, y = dp[w-item[0]]
+                if x + item[1] > dp[w][0]:
+                    dp[w] = (x+item[1], y+[item])
+    return dp[n][1]
 
-print(count_sum_squares(999))
+print(knapsack([(2,6),(2,3),(6,5),(5,4),(4,6)],10))
