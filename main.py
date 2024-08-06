@@ -12,12 +12,7 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-def pack_bagpack(val,wt,w):
-    n,dp=len(val),[0]*(w+1)
-    for i in range(1,n+1):
-        for j in range(w,0,-1):
-            if wt[i-1]<=j:
-                dp[j]=max(dp[j],dp[j-wt[i-1]]+val[i-1])
-    return dp[w]
+def count_sum_squares(n):
+    return n*(n+1)*(2*n+1)//6
 
-print(pack_bagpack([6,3,5,4,6],[2,2,6,5,4], 10))
+print(count_sum_squares(999))
