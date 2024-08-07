@@ -12,14 +12,12 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-def knapsack(items,n):
-    dp = [(0, []) for _ in range(n+1)]
-    for item in items:
-        for w in range(n, 0, -1):
-            if item[0] <= w:
-                x, y = dp[w-item[0]]
-                if x + item[1] > dp[w][0]:
-                    dp[w] = (x+item[1], y+[item])
-    return dp[n][1]
+def f(wt,val,w):
+    dp,n=[0]*(w+1),len(wt)
+    for i in range(1,n+1):
+        for j in range(w,0,-1):
+            if wt[i-1]<=j:
+                dp[j]=max(dp[j],dp[j-wt[i-1]]+val[i-1])
+    return dp[w]
 
-print(knapsack([(2,6),(2,3),(6,5),(5,4),(4,6)],10))
+print(f([2,2,6,5,4],[6,3,5,4,6],10))
