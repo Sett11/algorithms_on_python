@@ -12,19 +12,13 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-def prefix_tree(*args):
-    t={}
-    def insert(s):
-        c,x,n=t,'',len(s)
-        for i in range(n):
-            x+=s[i]
-            if x in c and c[x] is None and i!=n-1:
-                c[x]={}
-            if x not in c:
-                c[x]={} if i!=n-1 else None
-            c=c[x]
-    for i in args:
-       insert(i)
-    return t
-   
-print(prefix_tree("A","to", "tea", "ted", "ten", "i","in","inn"))
+def f(*a):
+    tree={}
+    for i in a:
+        l,node=len(i),tree
+        for j in range(1,l+1):
+            x=i[:j]
+            node[x]=node={} if l-j and node.get(x) is None else node.get(x)
+    return tree
+
+print(f('true','trie'))
