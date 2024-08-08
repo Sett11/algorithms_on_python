@@ -12,13 +12,18 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-def f(*a):
-    tree={}
+def radix_tree(*a):
+    d={}
     for i in a:
-        l,node=len(i),tree
-        for j in range(1,l+1):
-            x=i[:j]
-            node[x]=node={} if l-j and node.get(x) is None else node.get(x)
-    return tree
+        if i:
+            d[i[0]]=d.get(i[0],[])+[i[1:]]
+    z={}
+    for i in d:
+        t=radix_tree(*d[i])
+        if len(t)==1 and '' not in d[i]:
+            for j in t:
+                i,t=i+j,t[j]
+        z[i]=t
+    return z
 
-print(f('true','trie'))
+print(radix_tree("apple", "applet", "apple", "ape"))
