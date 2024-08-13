@@ -1,5 +1,7 @@
 import gmpy2
 import inspect
+import networkx as nx
+import matplotlib.pyplot as plt
 import re
 from math import ceil, inf
 from collections import defaultdict, deque, Counter
@@ -12,14 +14,15 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-import networkx as nx
 
 def shortest(start,end,a):
     G=nx.DiGraph()
     for i,j,k in a:
         G.add_node(i)
         G.add_edge(i,j,weight=k)
-    p=nx.shortest_path(G,start,end,lambda x,y,z:G[x][y]['weight'],method='bellman-ford')
-    return p,sum([G[p[i]][p[i+1]]['weight'] for i in range(len(p)-1)])
+    p=nx.shortest_path(G,start,end,lambda x,y,_:G[x][y]['weight'],method='bellman-ford')
+    r=(p,sum([G[p[i]][p[i+1]]['weight'] for i in range(len(p)-1)]))
+    nx.draw(G,with_labels=True,font_weight='bold')
+    plt.show()
 
 print(shortest('A','C',net_g))
