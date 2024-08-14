@@ -14,15 +14,27 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-
-def shortest(start,end,a):
-    G=nx.DiGraph()
-    for i,j,k in a:
-        G.add_node(i)
-        G.add_edge(i,j,weight=k)
-    p=nx.shortest_path(G,start,end,lambda x,y,_:G[x][y]['weight'],method='bellman-ford')
-    r=(p,sum([G[p[i]][p[i+1]]['weight'] for i in range(len(p)-1)]))
-    nx.draw(G,with_labels=True,font_weight='bold')
+def f(x,y,a):
+    g=nx.DiGraph()
+    for i in a:
+        if i not in g:
+            g.add_node(i)
+            for j in a[i]:
+                if j not in g:
+                    g.add_node(j)
+                g.add_edge(i,j,weight=a[i][j])
+    #path=nx.shortest_path(g,x,y,lambda x,y,_:g[x][y]['weight'])
+    options={
+    'node_color':'pink',
+    'node_size':2000,
+    'width':1,
+    'arrowstyle':'-|>',
+    'arrowsize':29,
+    'edge_color':'yellow',
+}
+    pos=nx.circular_layout(g)
+    nx.draw(g,pos,with_labels=True,font_weight='bold',**options)
+    nx.draw_networkx_edge_labels(g,pos,edge_labels={(j[0],j[1]):g[j[0]][j[1]]['weight'] for j in g.edges})
     plt.show()
 
-print(shortest('A','C',net_g))
+print(f('A','E',dg))
