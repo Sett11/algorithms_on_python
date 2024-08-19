@@ -129,6 +129,7 @@ matrix=[
 exp='((7+3)*(((5-2)+2)*3))'
 exp_dict={'+':add,'-':sub,'*':mul,'/':truediv}
 options={
+    'font_weight':'bold',
     'node_color':'pink',
     'node_size':2000,
     'width':1,
@@ -137,3 +138,5 @@ options={
     'edge_color':'yellow',
     'with_labels':True
 }
+
+back=[(2,6),(2,3),(6,5),(5,4),(4,6)]
