@@ -14,34 +14,87 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-class Graph:
-    def __init__(self):
-        self.nodes={}
+# BST
 
-    def add_node(self,v):
-        self.nodes[v]={}
+class Node:
+    def __init__(self,val=None,left=None,right=None):
+        self.val=val
+        self.left=left
+        self.right=right
+
+class BST:
+    def __init__(self):
+        self.root=Node()
+
+    def add(self,v,h=None):
+        h=h or self.root
+        if h.val is None:
+            h.val=v
+        else:
+            if v<=h.val:
+                if not h.left:
+                    h.left=Node(v)
+                else:
+                    self.add(v,h.left)
+            else:
+                if not h.right:
+                    h.right=Node(v)
+                else:
+                    self.add(v,h.right)
     
-    def add_edge(self,v,n,w=0):
-        if v not in self.nodes:
-            self.nodes[v]={}
-        if n not in self.nodes:
-            self.nodes[n]={}
-        self.nodes[v][n]=w
-        self.nodes[n][v]=w
+    def get_min(self):
+        v=None
+        def f(x):
+            nonlocal v
+            if not x:
+                return
+            if not x.left:
+                v=x.val
+                return
+            f(x.left)
+        f(self.root)
+        return v
     
+    def get_max(self):
+        v=None
+        def f(x):
+            nonlocal v
+            if not x:
+                return
+            if not x.right:
+                v=x.val
+                return
+            f(x.right)
+        f(self.root)
+        return v
+    
+    def __contains__(self,v):
+        b=False
+        def f(x):
+            nonlocal b
+            if not x or b:
+                return
+            if x.val==v:
+                b=True
+                return
+            f(x.left)
+            f(x.right)
+        f(self.root)
+        return b
+
     def __repr__(self):
         r=[]
-        for i in self.nodes:
-            s=f'{i} -> '
-            for j in self.nodes[i]:
-                s+=f'{j} '
-            r.append(s)
-        return '\n'.join(r)
-    
-g=Graph()
+        def f(x):
+            if not x:
+                return
+            f(x.left)
+            r.append(str(x.val))
+            f(x.right)
+        f(self.root)
+        return ' - '.join(r)
 
-g.add_edge(1,2,9)
-g.add_edge(1,7,11)
-g.add_edge(1,4,10)
-g.add_edge(2,6,11)
-print(repr(g))
+t=BST()
+
+[t.add(i) for i in q[:50]]
+print(repr(t))
+print(t.get_min(),t.get_max())
