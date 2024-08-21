@@ -14,87 +14,10 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-# BST
+def subsets(a):
+    r=[[]]
+    for i in a:
+        r+=[x+[i] for x in r]
+    return r
 
-class Node:
-    def __init__(self,val=None,left=None,right=None):
-        self.val=val
-        self.left=left
-        self.right=right
-
-class BST:
-    def __init__(self):
-        self.root=Node()
-
-    def add(self,v,h=None):
-        h=h or self.root
-        if h.val is None:
-            h.val=v
-        else:
-            if v<=h.val:
-                if not h.left:
-                    h.left=Node(v)
-                else:
-                    self.add(v,h.left)
-            else:
-                if not h.right:
-                    h.right=Node(v)
-                else:
-                    self.add(v,h.right)
-    
-    def get_min(self):
-        v=None
-        def f(x):
-            nonlocal v
-            if not x:
-                return
-            if not x.left:
-                v=x.val
-                return
-            f(x.left)
-        f(self.root)
-        return v
-    
-    def get_max(self):
-        v=None
-        def f(x):
-            nonlocal v
-            if not x:
-                return
-            if not x.right:
-                v=x.val
-                return
-            f(x.right)
-        f(self.root)
-        return v
-    
-    def __contains__(self,v):
-        b=False
-        def f(x):
-            nonlocal b
-            if not x or b:
-                return
-            if x.val==v:
-                b=True
-                return
-            f(x.left)
-            f(x.right)
-        f(self.root)
-        return b
-
-    def __repr__(self):
-        r=[]
-        def f(x):
-            if not x:
-                return
-            f(x.left)
-            r.append(str(x.val))
-            f(x.right)
-        f(self.root)
-        return ' - '.join(r)
-
-t=BST()
-
-[t.add(i) for i in q[:50]]
-print(repr(t))
-print(t.get_min(),t.get_max())
+print(subsets([1,2,3,4]))
