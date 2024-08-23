@@ -14,10 +14,10 @@ from random import shuffle,choice#,randint
 q=list(range(1,1503))
 shuffle(q)
 
-def subsets(a):
-    r=[[]]
-    for i in a:
-        r+=[x+[i] for x in r]
-    return r
+def f(n):
+    return 1 if n==1 else n*f(n-1)
 
-print(subsets([1,2,3,4]))
+def count_combinations_with_repeated_simbols(a):
+    return f(len(a))//reduce(mul,map(f,Counter(a).values()))
+
+print(count_combinations_with_repeated_simbols(['0', '5', '3', '0', '4', '3', '2']))
