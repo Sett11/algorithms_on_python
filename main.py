@@ -10,7 +10,7 @@ from gen_graph import matrix,dfs_a,dfs_b,seq,seq_b,generate_chess_knight_grafh,p
 from functools import reduce
 from itertools import product,zip_longest,permutations
 from copy import deepcopy
-from operator import mul,add,sub,truediv
+from operator import mul,add,sub,truediv,mod
 from decimal import Decimal
 from random import shuffle,choice#,randint
 q=list(range(1,1503))
@@ -18,80 +18,183 @@ shuffle(q)
 def fucken_indentations():
    ...
 
-def solve_puzzle(a):
-    n=len(a)//4
-    res,p,rows,cols=[[0 for _ in range(n)] for __ in range(n)],list(permutations(range(n),n)),[],[]
-    cl,cr=list(map(lambda x:count_steps(x,n),p)),list(map(lambda x:count_steps(x[::-1],n),p))
-    for i in range(n):
-        l,r=a[n*4-i-1],a[n+i]
-        rows.append([p[i] for i in range(len(p)) if (l==0 or cl[i]==l) and (r==0 or cr[i]==r)])
-    for i in range(n):
-        l,r=a[i],a[n*3-i-1]
-        cols.append([p[i] for i in range(len(p)) if (l==0 or cl[i]==l) and (r==0 or cr[i]==r)])
-    while [len(i) for i in rows].count(1)<n:
-        state=[len(i) for i in rows]+[len(i) for i in cols]
-        try_solve(rows,cols,res,n)
-        if [len(i) for i in rows].count(1)<n and [len(i) for i in rows]+[len(i) for i in cols]==state:
-            heights_sort=sorted([(len(j),0,i) for i,j in enumerate(rows)]+[(len(j),1,i) for i,j in enumerate(cols)])
-            v=False
-            for height in heights_sort:
-                if height[0]==1:
-                    continue
-                index=height[2]
-                for i in range(height[0]):
-                    c_rows,c_cols,c_puzzle=[i.copy() for i in rows],[i.copy() for i in cols],[i.copy() for i in res]
-                    if height[1]==0:
-                        c_rows[index]=[rows[index][i]]
-                    else:
-                        c_cols[index]=[cols[index][i]]
-                    if not try_solve(c_rows,c_cols,c_puzzle,n):
-                        if height[1]==0:
-                            rows[index].pop(i)
-                        else:
-                            cols[index].pop(i)
-                        v=True
-                        break
-                if v:
-                    break
-            if not v:    
-                break
-    return res
+def tokenize(expression):
+    if not expression:
+        return []
+    regex = re.compile("\s*(=>|[-+*\/\%=\(\)]|[A-Za-z_][A-Za-z0-9_]*|[0-9]*\.?[0-9]+)\s*")
+    tokens = regex.findall(expression)
+    return [s for s in tokens if not s.isspace()]
 
-def count_steps(a,n):
-    m=s=0
-    for i in a:
-        if i>=m:
-            s+=1
-            m=i
-        if i>=n-1:
-            break
-    return s
+def is_number(d):
+    p=re.compile(r"\A[-]?\d+(?:\.\d+)?\Z")
+    return bool(p.search(d))
 
-def try_solve(rows,cols,puzzle,n):
-    v=True
-    while v:
-        v=False
-        for row in range(n):
-            for col in range(n):
-                count_cols=[len(hyp(cols[col],row,i))>0 for i in range(n)]
-                count_rows=[len(hyp(rows[row],col,i))>0 for i in range(n)]
-                if count_rows.count(True)==0 or count_cols.count(True)==0:
-                    return False
-                if count_rows.count(True)==1 or puzzle[row][col]==0:
-                    puzzle[row][col]=count_rows.index(True)+1
-                elif count_cols.count(True)==1 or puzzle[row][col]==0:
-                    puzzle[row][col]=count_cols.index(True)+1
-                for i in range(n):
-                    if count_cols[i]==count_rows[i]:
-                        continue
-                    if count_cols[i]:
-                        cols[col]=[r for r in cols[col] if r[row]!=i]
-                    if count_rows[i]:
-                        rows[row]=[c for c in rows[row] if c[col]!=i]
-                    v=True
-    return True    
+class Environment(dict):
+    def __init__(self, operators = {}, functions = {}, variables = {}, keywords = {}):
+        self.update(operators = operators, functions = functions, variables = variables, keywords = keywords)
 
-def hyp(a,x,h):
-    return [i[x] for i in a if i[x]==h]
+class Func:
+    def __init__(self, params, expr, interpreter):
+        self.params, self.expr = params, expr
+        self.env = Environment(interpreter.env["operators"], interpreter.env["functions"])
+        self.ary = len(params)
+        self.interp = interpreter
 
-print(solve_puzzle([7,0,0,0,2,2,3, 0,0,3,0,0,0,0, 3,0,3,0,0,5,0, 0,0,0,0,5,0,4]))
+    def __call__(self, *args):
+        self.env["variables"].update(zip(self.params, args))
+        return self.interp.eval_postfix(self.interp.shunting_yard(self.expr, self.env), self.env)
+
+class Interpreter:
+    def __init__(self):
+        variables = {}
+        functions = {}
+        operators = {
+            "+":add,
+            "-":sub,
+            "*":mul,
+            "/":truediv,
+            "%":mod,
+            "=": self._assign_var
+        }
+        keywords = ["fn"]
+        self.env = Environment(operators, functions, variables, keywords)
+
+    def input(self, expression):
+        tokens = tokenize(expression)
+        if not tokens:
+            return ""
+        if tokens[0] in self.env["keywords"]:
+            if tokens[0] == "fn":
+                new_fn_name = tokens[1]
+                if new_fn_name in self.env["variables"]:
+                    raise Exception("Cannot overwrite variable with function!")
+                assign_op_index = tokens.index("=>")
+                params = tokens[2:assign_op_index]
+                if len(params) != len(set(params)):
+                    raise Exception("Duplicate parameters specified!")
+                expr = tokens[assign_op_index+1:]
+                for token in expr:
+                    if token.isalpha() and token not in params:
+                        raise Exception("Function body contains unknown variables!")
+                new_fn = Func(params, expr, self)
+                self.env["functions"][new_fn_name] = new_fn
+                return ""
+        else:
+            value = self.eval_expr(tokens)
+        return value
+
+    def eval_expr(self, tokens):
+        return self.eval_postfix(self.shunting_yard(tokens))
+
+    def _assign_var(self, name, value):
+        if name in self.env["functions"]:
+            raise Exception("Cannot overwrite function with variable!")
+        self.env["variables"][name] = value
+        return value
+
+    def shunting_yard(self, expression, env = None):
+        if env is None:
+            env = self.env
+        def precedence(operator):
+            if operator == '+' or operator == '-':
+                return 2
+            elif operator == '*' or operator == '/' or operator == '%':
+                return 3
+            elif operator == "=":
+                return 1
+            else:
+                raise Exception("%s is not a valid operator." % operator)
+        def is_left_assoc(operator):
+            if operator == "=":
+                return False
+            return True
+
+        output = []
+        operators = []
+        for token in expression:
+            if is_number(token):
+                try:
+                    output.append(int(token))
+                except ValueError:
+                    output.append(float(token))
+            elif token in env["functions"]:
+                operators.append(token)
+            elif token in env["variables"]:
+                output.append(token)
+            elif token in env["operators"]:
+                if operators and operators[-1] in env["operators"]:
+                    o1 = token
+                    o2 = operators[-1]
+                    while operators and o2 in env["operators"] and ((is_left_assoc(o1) and precedence(o1) <= precedence(o2)) or (not is_left_assoc(o1) and precedence(o1) < precedence(o2))):
+                        output.append(env["operators"][operators.pop()])
+                        try:
+                            o2 = operators[-1]
+                        except IndexError:
+                            break
+                operators.append(token)
+            elif token == "(":
+                operators.append(token)
+            elif token == ")":
+                while operators and operators[-1] != "(" and operators[-1] in env["operators"]:
+                    output.append(env["operators"][operators.pop()])
+                try:
+                    operators.pop()
+                except IndexError:
+                    raise Exception("ERROR: Mismatched parentheses!")
+                if operators and operators[-1] in env["functions"]:
+                    output.append(env["functions"][operators.pop()])
+            else:
+                output.append(token)
+        while operators:
+            if operators[-1] in env["operators"]:
+                output.append(env["operators"][operators.pop()])
+            elif operators[-1] in env["functions"]:
+                output.append(env["functions"][operators.pop()])
+            else:
+                raise Exception("Invalid function!")
+        return output
+
+    def eval_postfix(self, tokens, env = None):
+        if env is None:
+            env = self.env
+        if tokens is None:
+            return ""
+        output = []
+        for _, token in enumerate(tokens):
+            if isinstance(token, (int,float)):
+                output.append(token)
+            elif isinstance(token, Func):
+                try:
+                    args = [env["variables"][output.pop()] if output[-1] in env["variables"] else output.pop() for _ in range(token.ary)]
+                except IndexError:
+                    raise Exception("ERROR: Incorrect number of arguments passed to function!")
+                result = token(*args)
+                output.append(result)
+            elif callable(token):
+                right = output.pop()
+                left = output.pop()
+                if right in env["variables"]:
+                    right = env["variables"][right]
+                if isinstance(right, str):
+                    raise Exception("ERROR: Variable referenced before assignment!")
+                if left in env["variables"] and token != env["operators"]["="]:
+                    left = env["variables"][left]
+                result = token(left, right)
+                output.append(result)
+            elif isinstance(token, str):
+                output.append(token)
+        if len(output) > 1:
+            raise Exception("ERROR: Invalid syntax!")
+        try:
+            if output[0] in env["variables"]:
+                return env["variables"][output[0]]
+            elif isinstance(output[0], str):
+                raise Exception("Undeclared variable referenced!")
+            else:
+                return output[0]
+        except IndexError:
+            return ""
+        
+I=Interpreter()
+I.input("fn avg x y => (x + y) / 2")
+print(I.input("avg 4 2"))
