@@ -18,183 +18,88 @@ shuffle(q)
 def fucken_indentations():
    ...
 
-def tokenize(expression):
-    if not expression:
-        return []
-    regex = re.compile("\s*(=>|[-+*\/\%=\(\)]|[A-Za-z_][A-Za-z0-9_]*|[0-9]*\.?[0-9]+)\s*")
-    tokens = regex.findall(expression)
-    return [s for s in tokens if not s.isspace()]
+class Sudoku:
+   def __init__(self,a):
+      self.a=a
+      self._min=None
+      self._childrens=[]
 
-def is_number(d):
-    p=re.compile(r"\A[-]?\d+(?:\.\d+)?\Z")
-    return bool(p.search(d))
+   def get_i(self,i):
+      p=set(range(1,10))
+      for j in self.a[i]:
+         if j:
+            p.remove(j)
+      return p
+   
+   def get_j(self,j):
+      p=set(range(1,10))
+      for i in self.a:
+         if i[j]:
+            p.remove(i[j])
+      return p
+   
+   def get_sq(self,i,j):
+      p=set(range(1,10))
+      i,j=i//3*3,j//3*3
+      for k in range(i,i+3):
+         for c in range(j,j+3):
+            if self.a[k][c]:
+               p.remove(self.a[k][c])
+      return p
+   
+   def get_all(self,i,j):
+      return self.get_i(i).intersection(self.get_j(j),self.get_sq(i,j))
+   
+   @property
+   def get_min(self):
+      if not self._min:
+         m=10
+         for i in range(9):
+            for j in range(9):
+               if self.a[i][j]==0:
+                  n=len(self.get_all(i,j))
+                  if n<m:
+                     m=n
+                     self._min=(i,j)
+                     if n==1:
+                        return self._min
+      return self._min
+   
+   @property
+   def get_child(self):
+      if not self._childrens:
+         i,j=self.get_min
+         for k in self.get_all(i,j):
+            n=deepcopy(self.a)
+            n[i][j]=k
+            self._childrens.append(Sudoku(n))
+      return self._childrens
+   
+   @property
+   def check(self):
+      for i in self.a:
+         for j in i:
+            if j==0:
+               return False
+      return True
+   
 
-class Environment(dict):
-    def __init__(self, operators = {}, functions = {}, variables = {}, keywords = {}):
-        self.update(operators = operators, functions = functions, variables = variables, keywords = keywords)
+def f(g):
+   s=Sudoku(g)
+   a,b,c,r=deque([s]),deque([s]),deque(),s
+   while b:
+      if r.check:
+         return r.a
+      ch=[i for i in r.get_child if i not in a and i not in b and i not in c]
+      if not ch:
+         while a and a[0]==r:
+            c.appendleft(r),b.popleft(),a.popleft()
+            if b:
+               r=b[0]
+         a.appendleft(r)
+      else:
+         b.extendleft(ch)
+         r=b[0]
+         a.appendleft(r)
 
-class Func:
-    def __init__(self, params, expr, interpreter):
-        self.params, self.expr = params, expr
-        self.env = Environment(interpreter.env["operators"], interpreter.env["functions"])
-        self.ary = len(params)
-        self.interp = interpreter
-
-    def __call__(self, *args):
-        self.env["variables"].update(zip(self.params, args))
-        return self.interp.eval_postfix(self.interp.shunting_yard(self.expr, self.env), self.env)
-
-class Interpreter:
-    def __init__(self):
-        variables = {}
-        functions = {}
-        operators = {
-            "+":add,
-            "-":sub,
-            "*":mul,
-            "/":truediv,
-            "%":mod,
-            "=": self._assign_var
-        }
-        keywords = ["fn"]
-        self.env = Environment(operators, functions, variables, keywords)
-
-    def input(self, expression):
-        tokens = tokenize(expression)
-        if not tokens:
-            return ""
-        if tokens[0] in self.env["keywords"]:
-            if tokens[0] == "fn":
-                new_fn_name = tokens[1]
-                if new_fn_name in self.env["variables"]:
-                    raise Exception("Cannot overwrite variable with function!")
-                assign_op_index = tokens.index("=>")
-                params = tokens[2:assign_op_index]
-                if len(params) != len(set(params)):
-                    raise Exception("Duplicate parameters specified!")
-                expr = tokens[assign_op_index+1:]
-                for token in expr:
-                    if token.isalpha() and token not in params:
-                        raise Exception("Function body contains unknown variables!")
-                new_fn = Func(params, expr, self)
-                self.env["functions"][new_fn_name] = new_fn
-                return ""
-        else:
-            value = self.eval_expr(tokens)
-        return value
-
-    def eval_expr(self, tokens):
-        return self.eval_postfix(self.shunting_yard(tokens))
-
-    def _assign_var(self, name, value):
-        if name in self.env["functions"]:
-            raise Exception("Cannot overwrite function with variable!")
-        self.env["variables"][name] = value
-        return value
-
-    def shunting_yard(self, expression, env = None):
-        if env is None:
-            env = self.env
-        def precedence(operator):
-            if operator == '+' or operator == '-':
-                return 2
-            elif operator == '*' or operator == '/' or operator == '%':
-                return 3
-            elif operator == "=":
-                return 1
-            else:
-                raise Exception("%s is not a valid operator." % operator)
-        def is_left_assoc(operator):
-            if operator == "=":
-                return False
-            return True
-
-        output = []
-        operators = []
-        for token in expression:
-            if is_number(token):
-                try:
-                    output.append(int(token))
-                except ValueError:
-                    output.append(float(token))
-            elif token in env["functions"]:
-                operators.append(token)
-            elif token in env["variables"]:
-                output.append(token)
-            elif token in env["operators"]:
-                if operators and operators[-1] in env["operators"]:
-                    o1 = token
-                    o2 = operators[-1]
-                    while operators and o2 in env["operators"] and ((is_left_assoc(o1) and precedence(o1) <= precedence(o2)) or (not is_left_assoc(o1) and precedence(o1) < precedence(o2))):
-                        output.append(env["operators"][operators.pop()])
-                        try:
-                            o2 = operators[-1]
-                        except IndexError:
-                            break
-                operators.append(token)
-            elif token == "(":
-                operators.append(token)
-            elif token == ")":
-                while operators and operators[-1] != "(" and operators[-1] in env["operators"]:
-                    output.append(env["operators"][operators.pop()])
-                try:
-                    operators.pop()
-                except IndexError:
-                    raise Exception("ERROR: Mismatched parentheses!")
-                if operators and operators[-1] in env["functions"]:
-                    output.append(env["functions"][operators.pop()])
-            else:
-                output.append(token)
-        while operators:
-            if operators[-1] in env["operators"]:
-                output.append(env["operators"][operators.pop()])
-            elif operators[-1] in env["functions"]:
-                output.append(env["functions"][operators.pop()])
-            else:
-                raise Exception("Invalid function!")
-        return output
-
-    def eval_postfix(self, tokens, env = None):
-        if env is None:
-            env = self.env
-        if tokens is None:
-            return ""
-        output = []
-        for _, token in enumerate(tokens):
-            if isinstance(token, (int,float)):
-                output.append(token)
-            elif isinstance(token, Func):
-                try:
-                    args = [env["variables"][output.pop()] if output[-1] in env["variables"] else output.pop() for _ in range(token.ary)]
-                except IndexError:
-                    raise Exception("ERROR: Incorrect number of arguments passed to function!")
-                result = token(*args)
-                output.append(result)
-            elif callable(token):
-                right = output.pop()
-                left = output.pop()
-                if right in env["variables"]:
-                    right = env["variables"][right]
-                if isinstance(right, str):
-                    raise Exception("ERROR: Variable referenced before assignment!")
-                if left in env["variables"] and token != env["operators"]["="]:
-                    left = env["variables"][left]
-                result = token(left, right)
-                output.append(result)
-            elif isinstance(token, str):
-                output.append(token)
-        if len(output) > 1:
-            raise Exception("ERROR: Invalid syntax!")
-        try:
-            if output[0] in env["variables"]:
-                return env["variables"][output[0]]
-            elif isinstance(output[0], str):
-                raise Exception("Undeclared variable referenced!")
-            else:
-                return output[0]
-        except IndexError:
-            return ""
-        
-I=Interpreter()
-I.input("fn avg x y => (x + y) / 2")
-print(I.input("avg 4 2"))
+print(f(sudoku))
