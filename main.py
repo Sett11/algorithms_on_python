@@ -3,7 +3,7 @@ import inspect
 import networkx as nx
 import matplotlib.pyplot as plt
 import re
-from math import ceil,inf,factorial
+from math import ceil,floor,inf,factorial,log10,pi,e
 from collections import defaultdict,deque,Counter
 from string import ascii_uppercase,digits
 from gen_graph import matrix,dfs_a,dfs_b,seq,seq_b,generate_chess_knight_grafh,p_graph as g,d_graph as dg,f_grapf as fg, ff_g,exp,exp_dict,net_g,options,back,sudoku,kad
@@ -18,21 +18,7 @@ shuffle(q)
 def fucken_indentations():
    ...
 
-def bouncy_count(n):
-   a,b,t=[1]*9,[1]*9,10
-   for _ in range(2,n+1):
-      c,d=[0]*9,[1]*9
-      x=y=0
-      for j in range(8,-1,-1):
-         x+=a[j]
-         c[j]+=x
-         t+=c[j]
-      for j in range(9):
-         y+=b[j]
-         d[j]+=y
-         t+=d[j]
-      t-=9
-      a,b,c,d=c,d,a,b
-   return 10**n-t if n else 0
+def kamenetsky(n):
+   return 1 if n<2 else floor(n*log10(n/e)+log10(2*pi*n)/2)+1
 
-print(bouncy_count(4))
+print(kamenetsky(1000))
