@@ -1,5 +1,6 @@
 import gmpy2
 import inspect
+import bisect
 import networkx as nx
 import matplotlib.pyplot as plt
 import re
@@ -18,7 +19,12 @@ shuffle(q)
 def fucken_indentations():
    ...
 
-def kamenetsky(n):
-   return 1 if n<2 else floor(n*log10(n/e)+log10(2*pi*n)/2)+1
+def smaller(arr):
+    a,r=sorted(arr),[]
+    for i in arr:
+        j=bisect.bisect_left(a,i)
+        r.append(j)
+        del a[j]
+    return r
 
-print(kamenetsky(1000))
+print(smaller([5, 4, 7, 9, 2, 4, 1, 4, 5, 6]))
