@@ -1,3 +1,4 @@
+import numpy as np
 import gmpy2
 import inspect
 import bisect
@@ -19,12 +20,14 @@ shuffle(q)
 def fucken_indentations():
    ...
 
-def smaller(arr):
-    a,r=sorted(arr),[]
-    for i in arr:
-        j=bisect.bisect_left(a,i)
-        r.append(j)
-        del a[j]
-    return r
 
-print(smaller([5, 4, 7, 9, 2, 4, 1, 4, 5, 6]))
+# def regression_line_with_np(x,y):
+#     a,b=np.polyfit(x,y,1)
+#     return round(b,4),round(a,4)
+
+def regression_line(x,y):
+    n,xq,xs,ys,xys=len(x),sum(i**2 for i in x),sum(x),sum(y),sum(i*j for i,j in zip(x,y))
+    k=n*xq-xs**2
+    return round((xq*ys-xs*xys)/k,4),round((n*xys-xs*ys)/k,4)
+
+print(regression_line([56,42,72,36,63,47,55,49,38,42,68,60],[147,125,160,118,149,128,150,145,115,140,152,155]))
