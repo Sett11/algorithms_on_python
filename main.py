@@ -20,11 +20,14 @@ shuffle(q)
 def fucken_indentations():
    ...
 
+def count_subsequences(t,s):
+    n,m=len(s),len(t)
+    a=[0]*m
+    for i in range(n):
+        for j in range(m-1,-1,-1):
+            if s[i]==t[j]:
+                a[j]+=a[j-1] if j else 1
+    return a[-1]
 
-
-
-def regression_line_with_np(x,y):
-    a,b=np.polyfit(x,y,1)
-    return round(b,4),round(a,4)
-
-print(regression_line_with_np([56,42,72,36,63,47,55,49,38,42,68,60],[147,125,160,118,149,128,150,145,115,140,152,155]))
+print(count_subsequences("happy birthday", "appyh appy birth day"))
+print(count_subsequences("happy birthday", "hhaappyy bbiirrtthhddaayy"))
