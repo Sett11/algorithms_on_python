@@ -20,25 +20,55 @@ shuffle(q)
 def fucken_indentations():
    ...
 
-ELEMENTS={'H': 'Hydrogen', 'He': 'Helium', 'Li': 'Lithium', 'Be': 'Beryllium', 'B': 'Boron', 'C': 'Carbon', 'N': 'Nitrogen', 'O': 'Oxygen', 'F': 'Fluorine', 'Ne': 'Neon', 'Na': 'Sodium', 'Mg': 'Magnesium', 'Al': 'Aluminium', 'Si': 'Silicon', 'P': 'Phosphorus', 'S': 'Sulfur', 'Cl': 'Chlorine', 'Ar': 'Argon', 'K': 'Potassium', 'Ca': 'Calcium', 'Sc': 'Scandium', 'Ti': 'Titanium', 'V': 'Vanadium', 'Cr': 'Chromium', 'Mn': 'Manganese', 'Fe': 'Iron', 'Co': 'Cobalt', 'Ni': 'Nickel', 'Cu': 'Copper', 'Zn': 'Zinc', 'Ga': 'Gallium', 'Ge': 'Germanium', 'As': 'Arsenic', 'Se': 'Selenium', 'Br': 'Bromine', 'Kr': 'Krypton', 'Rb': 'Rubidium', 'Sr': 'Strontium', 'Y': 'Yttrium', 'Zr': 'Zirconium', 'Nb': 'Niobium', 'Mo': 'Molybdenum', 'Tc': 'Technetium', 'Ru': 'Ruthenium', 'Rh': 'Rhodium', 'Pd': 'Palladium', 'Ag': 'Silver', 'Cd': 'Cadmium', 'In': 'Indium', 'Sn': 'Tin', 'Sb': 'Antimony', 'Te': 'Tellurium', 'I': 'Iodine', 'Xe': 'Xenon', 'Cs': 'Caesium', 'Ba': 'Barium', 'La': 'Lanthanum', 'Ce': 'Cerium', 'Pr': 'Praseodymium', 'Nd': 'Neodymium', 'Pm': 'Promethium', 'Sm': 'Samarium', 'Eu': 'Europium', 'Gd': 'Gadolinium', 'Tb': 'Terbium', 'Dy': 'Dysprosium', 'Ho': 'Holmium', 'Er': 'Erbium', 'Tm': 'Thulium', 'Yb': 'Ytterbium', 'Lu': 'Lutetium', 'Hf': 'Hafnium', 'Ta': 'Tantalum', 'W': 'Tungsten', 'Re': 'Rhenium', 'Os': 'Osmium', 'Ir': 'Iridium', 'Pt': 'Platinum', 'Au': 'Gold', 'Hg': 'Mercury', 'Tl': 'Thallium', 'Pb': 'Lead', 'Bi': 'Bismuth', 'Po': 'Polonium', 'At': 'Astatine', 'Rn': 'Radon', 'Fr': 'Francium', 'Ra': 'Radium', 'Ac': 'Actinium', 'Th': 'Thorium', 'Pa': 'Protactinium', 'U': 'Uranium', 'Np': 'Neptunium', 'Pu': 'Plutonium', 'Am': 'Americium', 'Cm': 'Curium', 'Bk': 'Berkelium', 'Cf': 'Californium', 'Es': 'Einsteinium', 'Fm': 'Fermium', 'Md': 'Mendelevium', 'No': 'Nobelium', 'Lr': 'Lawrencium', 'Rf': 'Rutherfordium', 'Db': 'Dubnium', 'Sg': 'Seaborgium', 'Bh': 'Bohrium', 'Hs': 'Hassium', 'Mt': 'Meitnerium', 'Ds': 'Darmstadtium', 'Rg': 'Roentgenium', 'Cn': 'Copernicium', 'Uut': 'Ununtrium', 'Fl': 'Flerovium', 'Uup': 'Ununpentium', 'Lv': 'Livermorium', 'Uus': 'Ununseptium', 'Uuo': 'Ununoctium'}
+class Segment_tree:
+    def __init__(self,a,op):
+        self.a=a
+        self.op=op
+        self.n=len(a)
+        self.tree=[None]*(self.n*4)
+        self.build_tree(self.a,0,0,self.n-1)
+    
+    def build_tree(self,a,n,l,r):
+        if l==r:
+            self.tree[n]=a[l]
+        else:
+            m=(l+r)//2
+            self.build_tree(a,2*n+1,l,m)
+            self.build_tree(a,2*n+2,m+1,r)
+            self.tree[n]=self.op(self.tree[2*n+1],self.tree[2*n+2])
 
-def elemental_forms(s):
-    s=s.lower()
-    a=sorted([i for i in ELEMENTS if i.lower() in s],key=lambda x:s.index(x.lower()))
-    w=[]
-    def find_ham_cycle(a,s,r,x):
-        if ''.join(r).lower()==x and r:
-            w.append(r)
+    def get_res(self,l,r,n=0,nl=0,nr=None):
+        if l<=nl and r>=nr:
+            return self.tree[n]
+        if r<nl or l>nr:
             return
-        n=len(s)
-        for i in range(n):
-            t=s[:i+1].title()
-            if t in a:
-                z=find_ham_cycle(a,s[i+1:],r+[t],x)
-                if z:
-                    w.append(z)
-                    return
-    find_ham_cycle(a,s,[],s)
-    return [[f'{ELEMENTS[j]} ({j})' for j in i] for i in w]
+        m=(nl+nr)//2
+        left_res=self.get_res(l,r,2*n+1,nl,m)
+        right_res=self.get_res(l,r,2*n+2,m+1,nr)
+        if left_res is None:
+            return right_res
+        if right_res is None:
+            return left_res
+        return self.op(left_res,right_res)
 
-print(elemental_forms('conversations'))
+def compute_ranges(a,op,r):
+    t,n=Segment_tree(a,op),len(a)
+    return [t.get_res(i[0],i[1]-1,nr=n-1) for i in r]
+
+def _sum(a,b): 
+    return a+b
+
+def _max(a,b): 
+    return a if a > b else b
+
+def _gcd(a,b): 
+    return a if b == 0 else _gcd(b, a%b)
+
+def _lcm(a,b): 
+    if a == 0: return b
+    if b == 0: return a
+    return a*b / _gcd(a,b)
+
+print(compute_ranges([1, 5, 8, 5, 1, 8], _sum, [[0, 4], [0, 6], [2, 4], [1, 4]]))
+print(compute_ranges([2, 4, 9, 1, 1, 14, 7], _max, [[0, 2], [2, 7], [1, 4], [4, 5], [5, 7], [2, 5]]))
+print(compute_ranges([0, 0, 4, 75, 12, 0, 16, 5], _gcd, [[1, 4], [2, 6], [0, 1], [1, 4], [4, 7]]))
