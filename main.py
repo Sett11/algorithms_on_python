@@ -1,6 +1,7 @@
-def late_ride(n):
-    a,b=divmod(n,60)
-    return sum(map(int,str(a)))+sum(map(int,str(b)))
+x=1000000
+a,b,c='012'*x,'000111222'*x,('0'*9+'1'*9+'2'*9)*x
 
-print(late_ride(808))
-print(late_ride(1439))
+def get_positions(n):
+    return int(a[n]),int(b[n]),int(c[n])
+
+print(get_positions(98))
