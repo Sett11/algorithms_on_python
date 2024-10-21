@@ -18,65 +18,20 @@ from random import shuffle,choice#,randint
 
 
 
-import heapq as h
+import sympy as sym
+from sympy.parsing.sympy_parser import standard_transformations as t
+from sympy.parsing.sympy_parser import parse_expr as p
+from re import findall, sub
 
+def f(s):
+    return sub(r'\d+[A-Za-z]+', lambda x: ''.join(i for i in x.group() if i.isdigit())+'*'+''.join(i for i in x.group() if i.isalpha()), s)
 
-class Node:
-    def __init__(self,s=None,n=None,l=None,r=None):
-        self.s=s
-        self.n=n
-        self.l=l
-        self.r=r
-    
-    def __lt__(self,other):
-        return self.n<other.n
+def solve(*a):
+    r,u=[],set()
+    for i in a:
+        u.update(findall(r'[A-Za-z]+',i))
+        r.append(tuple(f(i).split('=')))
+    return sym.solve([sym.Eq(p(x,transformations=t), p(y,transformations=t)) for x,y in r],tuple(sym.symbols(sorted(u))))
 
-def build_haffman_tree(a):
-    q=[Node(*i) for i in a]
-    h.heapify(q)
-    while len(q)>1:
-        l,r=h.heappop(q),h.heappop(q)
-        m=Node(n=l.n+r.n)
-        m.l,m.r=l,r
-        h.heappush(q,m)
-    return q[0]
-
-def gen_haffman_code(n,c='',r={}):
-    if n is not None:
-        if n.s is not None:
-            r[n.s]=c
-        gen_haffman_code(n.l,c+'0',r)
-        gen_haffman_code(n.r,c+'1',r)
-    return r
-
-def search_letters(a,s,x,q,n,z):
-    if x==z:
-        return q
-    for i in range(n,0,-1):
-        t=s[:i]
-        if t in a:
-            w=search_letters(a,s[i:],x+t,q+[a[t]],n,z)
-            if w:
-                return w
-
-def frequencies(s):
-    return list(Counter(s).items())
-
-def encode(f,s):
-    if len(f)<2:
-        return
-    if not s:
-        return ''
-    r=gen_haffman_code(build_haffman_tree(f))
-    return ''.join(r[i] for i in s)
-  
-def decode(f,b):
-    if len(f)<2:
-        return
-    if not b:
-        return ''
-    r=dict([i[::-1] for i in gen_haffman_code(build_haffman_tree(f)).items()])
-    return ''.join(search_letters(r,b,'',[],len(max(r,key=len)),b))
-
-print(encode(frequencies('mdj'),'mdj'))
-print(decode(frequencies('mdj'),'01110'))
+print(solve('-40r-3257+61v-83x-22u-8u+25t+94p+35s-25q+6y+14z-5w-101t=-17t+38y-51z+1036', '-89p-30x-106s+7v-79u+18r+26w-56w-21y+59x-46q+56y+33z-69t+10t=-12s+40t-20305', '-68z+97w-78v-54x+19p+2735+66s-22r+23u+89r+20p-62t-52q-11y=-2795-2827-25y+26s-2805', '-13r+5r+29t-24t-113x-91v+6z-38u-44p-19p+29t+3z+18x-26q+11w-85s+41y=-2p+8q-8y-6926+49u+12y-26w', '-52x+52v+99s-92z-26q-58u-71q-40p-3u-26w-83r-43t+71y+28p-30s=-21t-4728-47p-2s', '78q-79x+82w-52p+41t+68t-76r-20v-20r+11y-4273-26z+19u-48v-21s=12682+25t+7x+11q+38u', '-34r-22p+26y+5w-3q+76u-34p-24z+20w+40t+34r-87x-60s-96v=43z+36y+10471+18q', '-48u+34s+4800-31q-13t+16q+60r+35x+20x+41z-22y+76p-43y-6z+49s+36w-97v-24q=41t-10q+20t-14335', '-100x-70y-19z+121q+33w+84p-59s+97u+34v-25r-19v-33t=17z-51r+20p-6s+23824+29q+23z+34q', '42s+71v-15t-85u-16w-57x+78z+86y-46p-53x-87r-32y+74x-16q+8x=-2327+30z', '-45s-2729+52p+50t-86x+55z+34u-17y-106r-5602-79v+64w+47y+76q+8r=2781-12q+2s+31t+6s-29x+18s-26t'))
+print(solve("x=4y", "2x=8y", "x+y=5"))
