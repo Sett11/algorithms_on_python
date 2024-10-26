@@ -18,20 +18,128 @@ from random import shuffle,choice#,randint
 
 
 
-import sympy as sym
-from sympy.parsing.sympy_parser import standard_transformations as t
-from sympy.parsing.sympy_parser import parse_expr as p
-from re import findall, sub
+from collections import namedtuple
+from copy import deepcopy
 
-def f(s):
-    return sub(r'\d+[A-Za-z]+', lambda x: ''.join(i for i in x.group() if i.isdigit())+'*'+''.join(i for i in x.group() if i.isalpha()), s)
+Blob=namedtuple('Blob','x y size')
 
-def solve(*a):
-    r,u=[],set()
-    for i in a:
-        u.update(findall(r'[A-Za-z]+',i))
-        r.append(tuple(f(i).split('=')))
-    return sym.solve([sym.Eq(p(x,transformations=t), p(y,transformations=t)) for x,y in r],tuple(sym.symbols(sorted(u))))
+class Blobservation:
+    def __init__(self,h,w=None):
+        self.h=h
+        self.w=w or h
+        self._min=1e9
+        self._mat=[[0]*self.w for _ in range(self.h)]
+        self._board=deepcopy(self._mat)
+    
+    def _check(self,a):
+        for i in a:
+            try:
+                b,c,d=i.values()
+                if b<0 or b>=self.h or c<0 or c>=self.w or d<1 or d>21 or bool([j for j in i.values() if type(j)!=int]):
+                    return False
+            except:
+                return False
+        return True
+    
+    def populate(self,a):
+        if not self._check(a):
+            raise Exception('Is not valid populate!')
+        for i in a:
+            x,y,z=i['x'],i['y'],i['size']
+            self._board[x][y]+=z
+            self._min=min(self._min,self._board[x][y])
 
-print(solve('-40r-3257+61v-83x-22u-8u+25t+94p+35s-25q+6y+14z-5w-101t=-17t+38y-51z+1036', '-89p-30x-106s+7v-79u+18r+26w-56w-21y+59x-46q+56y+33z-69t+10t=-12s+40t-20305', '-68z+97w-78v-54x+19p+2735+66s-22r+23u+89r+20p-62t-52q-11y=-2795-2827-25y+26s-2805', '-13r+5r+29t-24t-113x-91v+6z-38u-44p-19p+29t+3z+18x-26q+11w-85s+41y=-2p+8q-8y-6926+49u+12y-26w', '-52x+52v+99s-92z-26q-58u-71q-40p-3u-26w-83r-43t+71y+28p-30s=-21t-4728-47p-2s', '78q-79x+82w-52p+41t+68t-76r-20v-20r+11y-4273-26z+19u-48v-21s=12682+25t+7x+11q+38u', '-34r-22p+26y+5w-3q+76u-34p-24z+20w+40t+34r-87x-60s-96v=43z+36y+10471+18q', '-48u+34s+4800-31q-13t+16q+60r+35x+20x+41z-22y+76p-43y-6z+49s+36w-97v-24q=41t-10q+20t-14335', '-100x-70y-19z+121q+33w+84p-59s+97u+34v-25r-19v-33t=17z-51r+20p-6s+23824+29q+23z+34q', '42s+71v-15t-85u-16w-57x+78z+86y-46p-53x-87r-32y+74x-16q+8x=-2327+30z', '-45s-2729+52p+50t-86x+55z+34u-17y-106r-5602-79v+64w+47y+76q+8r=2781-12q+2s+31t+6s-29x+18s-26t'))
-print(solve("x=4y", "2x=8y", "x+y=5"))
+
+    def print_state(self):
+        r,m=[],1e9
+        for i in range(self.h):
+            for j in range(self.w):
+                if self._board[i][j]:
+                    m=min(m,self._board[i][j])
+                    r.append([i,j,self._board[i][j]])
+        self._min=m
+        return sorted(r,key=lambda x:(x[0],x[1]))
+    
+    def _next_step(self,curr,a):
+        if not a:
+            return curr.x,curr.y,0
+
+        def hand(a,b):
+            s=max(abs(a.x-b.x),abs(a.y-b.y))
+            if s==1:
+                return b.x,b.y,b.size
+            if a.x==b.x:
+                if a.y<b.y:
+                    return a.x,a.y+1,0
+                else:
+                    return a.x,a.y-1,0
+            if a.y==b.y:
+                if a.x<b.x:
+                    return a.x+1,a.y,0
+                else:
+                    return a.x-1,a.y,0
+            if a.x<b.x and a.y<b.y:
+                return a.x+1,a.y+1,0
+            if a.x>b.x and a.y>b.y:
+                return a.x-1,a.y-1,0
+            if a.x<b.x and a.y>b.y:
+                return a.x+1,a.y-1,0
+            if a.x>b.x and a.y<b.y:
+                return a.x-1,a.y+1,0
+            
+        if len(a)==1:
+            return hand(curr,a[0])
+        m=max(a,key=lambda e:e.size).size
+        a=[i for i in a if i.size==m]
+        if len(a)==1:
+            return hand(curr,a[0])
+        b=sorted([i for i in a if i.x<=curr.x and i.y>=curr.y],key=lambda e:(e.x,e.y))
+        if b:return hand(curr,b[0])
+        b=sorted([i for i in a if i.x>=curr.x and i.y>=curr.y],key=lambda e:(e.x,-e.y))
+        if b:return hand(curr,b[0])
+        b=sorted([i for i in a if i.x>=curr.x and i.y<=curr.y],key=lambda e:(-e.x,-e.y))
+        if b:return hand(curr,b[0])
+        b=sorted([i for i in a if i.x<=curr.x and i.y<=curr.y],key=lambda e:(-e.x,-e.y))
+        if b:return hand(curr,b[0])
+        return 'What the fack!???'
+    
+    def move(self,n=1):
+        if type(n)!=int or n<1:
+            raise Exception('Not valid input!')
+        k=0
+        a=list(map(lambda x:Blob(*x),self.print_state()))
+        while n:
+            r={}
+            if len(a)<=1:
+                break
+            k=1
+            for i in a:
+                r[i]=[]
+                m=1e9
+                if i.size!=self._min:
+                    for j in a:
+                        if j.size<i.size:
+                            d=max(abs(i.x-j.x),abs(i.y-j.y))
+                            m=min(m,d)
+                            r[i].append([j,d])
+                    r[i]=[k[0] for k in r[i] if k[1]==m]
+            r,q,w={i:self._next_step(i,r[i]) for i in r},deepcopy(self._mat),{}
+            for i in r:
+                b,c,_=r[i]
+                d=i.size
+                t=b,c
+                q[b][c]+=d
+                if t not in w:
+                    w[t]=0
+                w[t]+=d
+            a=[Blob(*(list(i)+[w[i]])) for i in w]
+            n-=1
+        if k:
+            self._board=q
+
+b=Blobservation(10,9)
+b.populate([{'x': 6, 'y': 6, 'size': 16}, {'x': 1, 'y': 6, 'size': 16}, {'x': 6, 'y': 3, 'size': 2}, {'x': 1, 'y': 4, 'size': 4}, {'x': 5, 'y': 1, 'size': 5}, {'x': 1, 'y': 8, 'size': 11}, {'x': 1, 'y': 1, 'size': 12}, {'x': 9, 'y': 0, 'size': 13}, {'x': 2, 'y': 3, 'size': 2}, {'x': 1, 'y': 0, 'size': 11}, {'x': 5, 'y': 7, 'size': 14}, {'x': 5, 'y': 2, 'size': 20}, {'x': 6, 'y': 1, 'size': 17}, {'x': 8, 'y': 4, 'size': 16}])
+print(b.move(6))
+print(b.move(2))
+print(b.move(1992))
+print(b.print_state())
