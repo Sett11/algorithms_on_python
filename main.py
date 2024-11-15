@@ -18,45 +18,38 @@ from random import shuffle,choice#,randint
 
 
 
-from math import ceil
-from copy import deepcopy
+from collections import Counter
+from string import ascii_uppercase as ac
 
-def encode(s):
-	n=ceil(len(s)**.5)
-	a,q,w=[[1]*n for _ in range(n)],[(0,0),(0,n-1),(n-1,n-1),(n-1,0)],list(s[::-1])
-	r=deepcopy(q)
-	while w:
-		for x,y in r:
-			if not w:
-				break
-			if a[x][y]!=1:
-				q[0],q[1],q[2],q[3]=(q[0][0]+1,q[0][1]+1),(q[1][0]+1,q[1][1]-1),(q[2][0]-1,q[2][1]-1),(q[3][0]-1,q[3][1]+1)
-				r=deepcopy(q)
-				break
-			a[x][y]=w.pop()
-		else:
-			r[0],r[1],r[2],r[3]=(r[0][0],r[0][1]+1),(r[1][0]+1,r[1][1]),(r[2][0],r[2][1]-1),(r[3][0]-1,r[3][1])
-	return ''.join(''.join([j if j!=1 else ' ' for j in i]) for i in a)
+fr={'A': 8.17, 'B': 1.49, 'C': 2.78, 'D': 4.25, 'E': 2.7, 'F': 2.23, 'G': 2.02, 'H': 6.09, 'I': 6.97, 'J': 0.15, 'K': 0.77, 'L': 4.03, 'M': 2.41, 'N': 6.75, 'O': 7.51, 'P': 1.93, 'Q': 0.1, 'R': 5.99, 'S': 6.33, 'T': 9.06, 'U': 2.76, 'V': 0.98, 'W': 2.36, 'X': 0.15, 'Y': 1.97, 'Z': 0.07}
 
-def decode(s):
-	l=len(s)
-	n=ceil(l**.5)
-	a,q,c=[list(s[i:i+n]) for i in range(0,l,n)],[(0,0),(0,n-1),(n-1,n-1),(n-1,0)],''
-	r=deepcopy(q)
-	while len(c)<l:
-		for x,y in r:
-			if a[x][y]==1:
-				q[0],q[1],q[2],q[3]=(q[0][0]+1,q[0][1]+1),(q[1][0]+1,q[1][1]-1),(q[2][0]-1,q[2][1]-1),(q[3][0]-1,q[3][1]+1)
-				r=deepcopy(q)
-				break
-			c+=a[x][y]
-			a[x][y]=1
-		else:
-			r[0],r[1],r[2],r[3]=(r[0][0],r[0][1]+1),(r[1][0]+1,r[1][1]),(r[2][0],r[2][1]-1),(r[3][0]-1,r[3][1])
-	return c.strip()
-		
-	
-print(encode('I would be presumptuous, indeed, to present myself against the distinguished gentlemen to whom you have listened if this were but a measuring of ability; but this is not a contest among persons. The humblest citizen in all the land when clad in the armor of a righteous cause is stronger than all the whole hosts of error that they can bring.'))
-print(decode('Iubrmo e pemlgshin is teoooale t etmhlisug l;tistceagrrged nshueczilhaw . letuead  ofrtsui eanpnrnnstgt   lortmi uas   s erahcoeas mie tlah bg  rrhri ue d tuo     . a esvtstoahet     ttin ir  i  lh     ewel nn,hhionon   iae eoiydyu m  ny trfssnshf,hylent hhlaroshmwautihn ecoga rhic  tumfTled   nttb  s epnnopotnan tbtboies daabeifese  w eeegout  i steodnsts dw'),sep='\n')
-print(decode('Stsgiriuar i ninmd l otac'),sep='\n')
-print(decode('Rntodomiimuea  m'),sep='\n')
+def get_key_length(s,n):
+    r,m={},0
+    for i in range(2,n+1):
+        t=[]
+        for j in range(i+1):
+            x=s[j::i]
+            c=Counter(x)
+            t.append(sum(c[k]*(c[k]-1)/(len(x)*(len(x)-1)) for k in x))
+        y=sum(t)/len(t)
+        r[y]=i
+        m=max(m,y)
+    return r[m]
+
+def get_keyword(s,n):
+    a,r=[s[i::n] for i in range(n)],''
+    for i in a:
+        l,t,m=len(i),{},1000
+        for j in range(1,27):
+            x=[ac[ac.index(k)-j] for k in i]
+            c=Counter(x)
+            y=sum(abs(fr[j]-round(c[j]/l*100,2)) for j in c)
+            m=min(m,y)
+            t[y]=j
+        r+=ac[t[m]%26]
+    return r
+
+t='+vzf>=xsIzP/bqDKF/I8BvG\\vrfvi`vDPOy|zCIfD]I8wzG\\x8zSA/GHDJL+CzTfQ|ICIB\x0cU%COzBUrIOCM`boIyi[rHCzK+KwxDy\\bQCvP@vGf\'S|NwyBCUUCyBQ]E8{\'C zGfXy`ICGG UtoGGC.bHCzijzuzIC`v8xDN<vFfPL,IsvFy,CsfDLUywNfp)nmfKG/tsf`<<v8VGN<rpzOi0zDCzPubwIfyUtvDGB`vB`Ni[ruvUG\\v`f$LUinms\rU*qDzL|ztDxi\x0bDsMDA+E8yzQ-IwwzBUKvzf>=xsIzP/bqDKF/I8vNiuzAKJQ{zpGzi]w8OMy\\JzvOG]E?\n/F=J8MzN}KoODM\\bKvNi\\FHfyC{vFQzBBbQCvP@vGfWy,soBzi=J8FIM E8OJi<rJzfz`FyzIi+bJvMG+EHfJDUKvzfA=GvzMi+J8zvP@P8vNi"pjp\x0ci<FKzQC`{8Czi.zrI`RUGIwGG{y8CDQUNCMF\x0c8rGDNI=bsIOG`vzTfz`FyzfR<v8xDN<vFfvL.bDPwJ=Jvzyi|ysfOC-yBDLS/bwIfR<v8muR<bqzIR}IM\nf#~vBfwC:FFzfR<zG fR<FIBC\rUJCHzi{BwGGC.bqMTN|rBvGW{KGfxM}CrfJA-rGDJL+CzTfz`voFfR<v8xDN<vFfDLUKvzfp\'KvfxC\\KIMT~kzyDKC.zo|'
+print(get_key_length(t,10))
+k='NSWXARWJGEXIJCZWUZLOAWFJFTUIMUVFEWHWPEEVVCYENYSGVVECSRZLGFDRZBPKWPMIYTFFGQDRJOKOTWWIWNVKUOBEXOLLZFDCOWZLJCXXQSZFITUIMUVFVLVEJDKZGSVWWYNANZKERERFKRLSOYEUTOWMYLVLVSUJNEHMGBFCEFKZGSVWWYZKCPRYPTYWHFHUQEELWGHSBXISAGWSPRVSVNHFNAJAPEDXWRUAHTHVANKSWHKSNSYSXSKEXIKKYVLGDCRFDSUIBLVUVSGMJTYWKFXWAOWDGHWINSYWOWQKSAPKYFLXENXKVMOIBOIWZOPTHEZKXWVMXLPVKTIINEELHFRQBALDMBHVOLVLVSUFEGISOHUMCRREYCUHBRVIWSQGEEJOQFGPANXLJOQHOEELGBFIHEEYVVFEJBVUCZFYHAKWFTRVOPVUKTLGWUKZQFVEJDLKGRWSLRFNGCUHESGJQJHEQTYGTGKMLOWLGLWWAVVFHCUEQTYGTGZLKSVKVMOIOAIWPCWWKDZNGFJIJTRUEIUEPERNGFDKALVLVSUJNEHMGBFMASTSPCQPUBVYNSDRADSQCBDPUZZFIOOENGVSOCXRPOWJGDUIOEELCHLZATVPVKLXDTYWCJDMHASANWWCKFDGFSURYODHWHLRCAEVECOPACKAQBVSBLRJISWITTTGTDRVWSLUJQDPYUCSVWRROAIWGOVMHYDSFSHBWMGDGGFEJBVVTOZRBRFECJDVEEKQQTVSQRTWUDUIOSIWRCUXENXJGZLKEOLKVSAXOSTAGBWMBITLGLWWWNUYGBHVWLWAEHLSJAEVVVHVAAIWFWIJARVFESVIOPVUKOOPUFFJISQINACXKQWMKNNAVVWLAPFKKHLSJOWZCBGMSIKZJPHGKMZFIARVACFEOCQLARSWTHVDEMZFJWVGHAJKKQLRPRFVWQWSNYTJADWSCRRHJMWITTTGFSVEJDJWEFHXSRZLKBJKEVVKVVHIJGCAUVOIPTVJHFHUQEEUAGHUQEEUGOVIPAFFTWVLZLWUOIJCLWSNMXAUVTYWOCVXYODEQBOIPTVJROLVOAJLJVHEJRVWTWQSJAKFFGWIOEEGHHHIZOILKVLEOTFSPRWLAMFKVQRQIOEVQIEPADCWVHHVOAJDNSHWOOFLVTIVNNEHRQFXDEKGRHZIHVVDGHWINSTGODUMOERTQIWSBTYWVCWEHUJSISWLATFHGWJLPLVLVSUWYODHTWVIWBFMVCIXDEKGVOOYOAXWNSWXARWJGEXIJCPSUOIYJCKAQBRJNAECEOQFAFZLVSGAALCTAGHZARRDTOQOBUEUVWRROWZLJHKIPWFHCFDQATVJECFLKBVLCFDRGFLFEHLSJBVAPUWLABVKVOQSPHVJTOQOBUEUVWRRSIKZPCDHFUJLCPOIBRVWROUEIEKWTOOWKFZLUHKIHEKLGFIVAQLWPQBHESKJKPXXEOEJGOVSJASDAKHPHTYWUOPIBUEUVWRRDAJTGSQYOEULQTLXPHVSOWQSWCZVHFHUQEEUAWQTNOKWKBVIMUVFESVEOPPMUWQKPHVNKQFMLHVJQFVSIEFLJSUGEPYWTPDWADFFCGWVWDUDKBJGDETCGFESWRULADLGWLCQWGHWWMEWOCQMYSLUJOVEOIELQSUVZRFHRWQKPHVKGQRRZRKGTSPIIBVJVVHXKPVAIVWGDAISEHHVOTYWWGHSBLVLVSUJNEHMGBFMASRFFTUIMUVFEMDRWLPKKGSPWYJSHIQHWMVFVOOVKLVAPQUCLTFYTOPWWNUKGJHVWLNGTRSYVZCWIOPIOIEUNIGMJGYSPUPEJSTJCPEPAAEVVVHXALVNKGLSJGREGGKSSWYWGZRJBOILWBHSJEFXVVHIWRCAGGWHASTJKDWMKNZFEZDWOITSNZLXARRLWFHSBAGHNMLRCTYWMBRAHEUYGCIIJGCAUVOIPTVJHFHUQEEUAHRWKLMAPUDGNYGLQUUEIIJXQIQHENVSRCHWBADGWGVXKRPLJSJSHDSMIKKINEKZGAHXDOUAUGXGYEJKHIOPUAGHNWHHPOUWEWSLARREGGVECEZFUHUYYTZFICQXDENZGFHEXOLLUCIEPRVSUIUIDIUVGBECYAGLCWQOEDUDGHWINFIWSIHRYIVKJOGEOTIGPUHJBETLQBWLADVKKUQSBSFEGYHCXORJFZDCKUKKVVHQKSKXTSTYANKDGHWINSRJGCQXDESGVHRQNONGHHKIXLZUMSQWZEIXGFWCLENJKHHVWNULJSKSIEIGYCIXDEUNQFDOOIDHNWIMADBWAPREND'
+print(get_keyword(k,8))
